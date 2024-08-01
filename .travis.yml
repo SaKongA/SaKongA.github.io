@@ -33,3 +33,5 @@ deploy:
   target-branch: gh-pages # 推送的目标分支 local_dir->>master 分支
   on:
     branch: hexo # 工作分支
+
+# 测试CI
