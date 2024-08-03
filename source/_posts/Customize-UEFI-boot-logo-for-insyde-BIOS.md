@@ -134,5 +134,5 @@ File -> Save as... -> Lilac-new.FD
 - 至此，刷写成功。
 
 ## Download Tools：
-- [InsydeH2OEZE_03.04.zip]()
-- [AMI_BIOS_Logo_Changer_v5.exe]()
+- [InsydeH2OEZE_03.04.zip](https://drive.google.com/file/d/1dsZIFeD5XgsKU3IWGQQ88_iETMrsU6UH/view?usp=sharing)
+- [AMI_BIOS_Logo_Changer_v5.exe](https://drive.google.com/file/d/1i9SkB8tXG_SROGEbQ6K-KntlFUhLWlFe/view?usp=sharing)
