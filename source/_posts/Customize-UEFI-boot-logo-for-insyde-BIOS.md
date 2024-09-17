@@ -1,6 +1,7 @@
 ---
 title: 分离机械革命笔记本电脑的EXE格式BIOS固件，并修改Insyde BIOS的UEFI启动logo
 date: 2024-08-01 22:49:23
+updated: 2024-08-30 16:12:22
 tags:
 ---
 ## Before This:  
@@ -72,7 +73,7 @@ Mode                 LastWriteTime         Length Name
     InterToolx64.efi
     Lilac.FD   <------
     mfc90u.dll
-    Microsoft.VC90.CRT.manifest
+    Microsoft.VC90.CRT.manifest 
     Microsoft.VC90.MFC.manifest
     msvcp90.dll
     msvcr90.dll
