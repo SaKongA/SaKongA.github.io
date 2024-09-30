@@ -9,7 +9,7 @@
     
     <title>
         
-            记一次简单的VUE+UniAPP逆向分析过程 |
+            一次华为蓝牙耳机SPP通讯的逆向之旅 |
         
         LostZone
     </title>
@@ -240,7 +240,7 @@
             <div class="post-content-bottom border-box">
                 
                     <div class="post-title">
-                        记一次简单的VUE+UniAPP逆向分析过程
+                        一次华为蓝牙耳机SPP通讯的逆向之旅
                     </div>
                 
 
@@ -268,12 +268,12 @@
         
             <span class="meta-info-item post-create-date">
                 <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
-                <span class="datetime">2024-07-05 13:29:10</span>
+                <span class="datetime">2024-09-17 20:01:49</span>
             </span>
 
             <span class="meta-info-item post-update-date">
                 <i class="icon fa-solid fa-file-pen"></i>&nbsp;
-                <span class="datetime" data-updated="Sat Jul 06 2024 09:19:27 GMT+0800">2024-07-06 09:19:27</span>
+                <span class="datetime" data-updated="Tue Sep 17 2024 20:01:49 GMT+0800">2024-09-17 20:01:49</span>
             </span>
         
 
@@ -303,78 +303,74 @@
                     
 
                     
-                         <h2 id="Before-This"><a href="#Before-This" class="headerlink" title="Before This:"></a>Before This:</h2><p>前些天朋友发给我了一个Android APP，让我看看能不能白嫖一下，不过以前没没有什么实操过应用逆向，所以也没有抱多大希望，抱着试一试的心态，来玩玩，结果到最后竟然成了，这也是我第一次接触VUE+UniApp的Android应用，因此写了这个帖子，来记录一下分析过程，不过难度很低，就当做涨知识了。  </p>
-<h2 id="1-熟悉"><a href="#1-熟悉" class="headerlink" title="1. 熟悉"></a>1. 熟悉</h2><p>其实从报名这里就可以看出来了，“uni.xxxx”-典型的UniApp打包的Android客户端APK包名，不过由于我是第一次接触，一开始并未发觉有什么问题，然后就是APK未加固，可能会简单点；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/0.jpg"
-                        alt="0" title="0"
-                 ><br>安装后打开，注册登录，发现所有的功能都提示“账户锁定或账户未激活”，查看后发现APP功能需要购买兑换码激活使用；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/1.jpg"
-                        alt="1" title="1"
-                 ></p>
-<h2 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h2><p>进行操作会检测账号状态，然后根据账号状态来返回相应结果，猜想可能是进行发送POST请求到服务器，来完成这个过程的，遂尝试抓包分析；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/2.jpg"
-                        alt="2" title="2"
-                 ></p>
-<p>利用“ProxyPin”进行抓包，这里我已经安装好ProxyPin的HTTPS证书，可以正常抓取HTTPS Packag，选择“更多-过滤-应用白名单”添加目标应用，然后开始抓包；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/3.jpg"
-                        alt="3" title="3"
-                 ></p>
-<p>幸运的是，APP没有做反抓包的相关机制，所以抓包很顺利，这里我们随便挑选一个功能，进行抓取请求，可以看到已经抓到验证的POST请求了；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/4.jpg"
-                        alt="4" title="4"
-                 ></p>
-<p>这里可以发现，APP竟然使用的是HTTP验证，查看抓包详情中的响应部分，这里是服务器返回的数据，没有加密，很清晰；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/5.jpg"
-                        alt="5" title="5"
-                 ></p>
-<p>其中code部分猜测是账号的激活状态，msg即message，返回的toast信息提示，time为时间戳，data为空值，由于我没并不知道code值为多少，账号是激活状态，所以这里猜一下，先试一下“1”；  </p>
-<p>点击“重写”按钮，来拦截返回数据，并做修改，将code值改为“1”，保存，返回APP，测试，完美，所有需要验证的功能都可以使用了；  </p>
-<p>那到这里，虽然我没没有办法确定code值具体的处理流程，但是至少值“1”可用，那接下来，转到APP代码部分的逆向分析，因为朋友那边不可能直接使用抓包重写。  </p>
-<h2 id="3-静态逆向分析"><a href="#3-静态逆向分析" class="headerlink" title="3. 静态逆向分析"></a>3. 静态逆向分析</h2><p>由于我这边第一次接触UniApp，一开始在这部分分析还是按照普通Java&#x2F;Kotlin AndroidApp的结构分析的，所以掉坑里了，所以如果你对UniApp很熟悉的话，可以跳过这部分（不过如果你对UniApp很熟悉，应该也不会看我这个文章）；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/6.jpg"
-                        alt="6" title="6"
-                 ></p>
-<p>解包APP后，我的思路是从发送POST的URL入手，遂MultiDex之，直接搜索POST目标地址相关代码，当，没有，所以我怀疑是不是用变量代替了字符，于是使用Arsc编辑器搜索POST目标地址相关字符，当，还是没有，到这里我随后又搜索了相关点击事件的入口，结果还是没找到，也包括checkAccount、AccountManager，都没有发现什么有价值的线索，在一筹莫展的时候，发现这个assets资源文件夹貌似很特殊，Google一下，才发现这个APP是VUE+UniAPP的JavaScript套壳APP；  </p>
-<p>于是直接找到关键Js:app-service.js，这个文件就是整个“小程序”的逻辑层，幸运的是，没有混淆加密，不过部分关键登录的地方，还是使用了Base64加密，打开自动换行，发现文字被转换为了Unicode字符串，不过这个对我们分析影响不大；<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/7.jpg"
-                        alt="7" title="7"
-                 ></p>
-<p>在编译后，整个Js逻辑层代码被压缩了，为了更易读，我们使用相关工具(Notepad++、VScode或一些在线网站)格式化一下代码即可；  </p>
-<p>现在，搜索“checkAccount”相关代码，55个结果，不过大部分代码逻辑都很相似，我们这边拿第一处为例：  </p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">getMessage</span>: <span class="keyword">function</span>(<span class="params">t</span>) &#123;                              <span class="comment">// 定义参数`t`</span></span><br><span class="line">    <span class="keyword">var</span> e = <span class="variable language_">this</span>;                                      <span class="comment">// 将`this`赋值到变量`e`   </span></span><br><span class="line">    (<span class="number">0</span>, a.<span class="property">checkAccount</span>)(&#123;&#125;).<span class="title function_">then</span>((<span class="keyword">function</span>(<span class="params">i</span>) &#123;        <span class="comment">// 调用`checkAccount`函数，传入该函数中的对象`&#123;&#125;`,并赋值到`i`</span></span><br><span class="line">        i.<span class="property">code</span> = <span class="number">1</span>, <span class="number">0</span> == i.<span class="property">code</span> ? uni.<span class="title function_">showToast</span>(&#123;      <span class="comment">//  将`i`的`code`属性设置为1，然后判断`i`对象中的`code`值，如果为0，继续执行，如果不为0，跳过</span></span><br><span class="line">            <span class="attr">title</span>: i.<span class="property">msg</span>,                              <span class="comment">//  赋值`i`中的`msg`信息到`tittle`</span></span><br><span class="line">            <span class="attr">icon</span>: <span class="string">&quot;none&quot;</span>,                              <span class="comment">//  icon为空</span></span><br><span class="line">            <span class="attr">duration</span>: <span class="number">2e3</span>                              <span class="comment">//  `duration`，时长，盲猜就是toast消息的通知时长</span></span><br><span class="line">        &#125;) : e.<span class="title function_">asheg</span>(t.<span class="property">detail</span>.<span class="property">data</span>[<span class="number">0</span>].<span class="property">action</span>)          <span class="comment">//  调用的`e`中的`asheg`方法，并向其中传入`t.detail.data[0].action`</span></span><br><span class="line">    &#125;))</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-<p>到这里，账户状态验证的流程我们也就摸清了，checkAccount方法会将post的回复传到这里，然后判断code值，是否为0，后面我也测试了，只要回复中的code值不为0，都可以通过验证；  </p>
-<p>一般这种情况我们直接将“0 &#x3D;&#x3D; i.code”改为“1 &#x3D;&#x3D; i.code”，理论上就可以通过验证，但是由于这个验证在逻辑层无处不在，如果55处全部更改，可能会出问题的，所以决定直接对“checkAccount”方法下手，很快就找到了关键方法：  </p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">e.<span class="property">checkAccount</span> = <span class="keyword">function</span>(<span class="params">t</span>) &#123;                         <span class="comment">//  函数声明，赋值给`e`，接受`t`</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="number">0</span>, n.<span class="property">myRequest</span>)(&#123;                          <span class="comment">//  返回`(0, n.myRequest)`的结果,调用myRequest函数，用于发起网络请求</span></span><br><span class="line">        <span class="attr">url</span>: <span class="string">&quot;api/common/checkAccount&quot;</span>,                <span class="comment">//  请求URL</span></span><br><span class="line">        <span class="attr">method</span>: <span class="string">&quot;post&quot;</span>,                                <span class="comment">//  请求方法</span></span><br><span class="line">        <span class="attr">data</span>: t                                        <span class="comment">//  请求的数据，这里指传入的函数`t`</span></span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>既然checkAccount会发送POST请求来获取相关回复，那我们可以直接把ProxyPin中抓到的回复体扔给他，把回复喂到他嘴里，就不要在请求了，如下：  </p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">e.<span class="property">checkAccount</span> = <span class="keyword">function</span>(<span class="params">t</span>) &#123;                         </span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="keyword">function</span>(<span class="params">resolve, reject</span>) &#123;</span><br><span class="line">       <span class="keyword">var</span> response = &#123;</span><br><span class="line">           <span class="attr">code</span>: <span class="number">1</span>,</span><br><span class="line">           <span class="attr">msg</span>: <span class="string">&quot;小飞棍来喽，这个msg其实已经没用了哈哈&quot;</span>,</span><br><span class="line">           <span class="attr">time</span>: <span class="string">&quot;1720159579&quot;</span>,                         <span class="comment">// 通过对上面验证部分的分析，并不会验证时间戳，所以这里是什么也无所谓了</span></span><br><span class="line">           <span class="attr">data</span>: <span class="literal">null</span></span><br><span class="line">       &#125;;</span><br><span class="line">       <span class="title function_">resolve</span>(response);</span><br><span class="line">   &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="4-打包测试"><a href="#4-打包测试" class="headerlink" title="4. 打包测试"></a>4. 打包测试</h2><p>打包回APK，签名，由于签名冲突，需要卸载现在的APP，安装好后，幸运的是，连签名验证都没有，测试功能，完美。<br><img  
-                       lazyload
-                       alt="image"
-                       data-src="/images/images/8.jpg"
-                        alt="8" title="8"
-                 ></p>
-<h2 id="Final"><a href="#Final" class="headerlink" title="Final:"></a>Final:</h2><ul>
-<li><p>需要注意的问题<br>在后面的测试中，发现软件的部分功能，需要将数据存储到服务器，这就导致了，APP开发者一觉醒来，发现竟然有没有认证的用户，在他服务器拉屎……（bushi，所以如果开发者真要想搞，也是很简单就能拉闸。  </p>
-</li>
-<li><p><strong>文章仅供学习交流，一切非法行为与本人无关！</strong></p>
-</li>
+                         <h2 id="Before-This"><a href="#Before-This" class="headerlink" title="Before This:"></a>Before This:</h2><p>长久以来，饱受华为蓝牙耳机APP客户端的拉跨使用体验折磨（目前华为耳机的控制APP主要有两个，一个是已经断更许久的智慧音频，另一个是及其臃肿的智慧生活，我就买了一个耳机，你给我上全家生态？）在很久之前就有了重构一个控制APP的想法了，但是奈何实在没有时间，所以耽搁了。大二开学，实习也结束了，今天终于有时间来实现以下这个想法了。不过本篇文章只会讲到比较关键的地方，至于具体的实现方法，后续可能会有帖子讲到。</p>
+<h2 id="1-从哪里入手？"><a href="#1-从哪里入手？" class="headerlink" title="1. 从哪里入手？"></a>1. 从哪里入手？</h2><p>我们想要实现一个耳机控制APP，最主要的两个目标如下：</p>
+<ul>
+<li>向耳机发送数据，接收耳机的返回数据</li>
+<li>解析耳机返回的数据，得到我们需要的数据形式</li>
 </ul>
+<p>在第一个目标中，由于每个厂商对于发送的数据格式的定义不同，所以我们如果想得到具体的控制数据内容，最简单的方法就是直接逆向现有的官方耳机控制APP，如“智慧音频”、“智慧生活”等，然后进行静态代码分析，找到APP中用来发送（或接收）蓝牙数据到设备的总方法，然后使用Xposed框架来Hook目标方法，从而获得对应数据内容，方便后续的模拟测试。  </p>
+<p>在第二个目标中，相比发送数据到设备来实现对设备的控制，难度要高出一些，你可能需要逆向静态分析在APP接收到设备的数据后，数据的整个解析过程，例如，设备返回的电量数据会是一组数组，字面上来看是毫无意义的，需要查询APP的解析过程，然后进行模拟实现，来获取真正的数值。</p>
+<h2 id="2-智慧音频APP-？"><a href="#2-智慧音频APP-？" class="headerlink" title="2. 智慧音频APP ？"></a>2. 智慧音频APP ？</h2><p>本篇文章中，将会对“智慧音频”APP进行逆向分析。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">APP Name: 智慧音频</span><br><span class="line">Package Nmae: com.huawei.audiogenesis</span><br><span class="line">Version Code: 100011303</span><br><span class="line">Package Size: 17.66M</span><br><span class="line">Reinforce: None</span><br></pre></td></tr></table></figure>
+<ul>
+<li>为什么不选择“智慧生活”APP？<br>我们这边把主要逆向“智慧音频”APP而不是“智慧生活”APP，一方面是“智慧生活”APP本身体量很大，涉及到的类和方法过于繁多，会严重干扰我们的方法确定和追溯；另一方面，在“智慧生活”APP中，耳机的控制功能是作为一个单独的耳机控制插件出现的，使用时需要单独下载，插件为APK格式，作为一个module嵌入到“智慧生活”主APP中，导致后面HOOK难度增高，其次，我们在研究时需要单独抓取网络下载GET包获取这个插件本体，而且浅浅的分析后，发现该插件和主APP间存在部分方法互相调用，对后面分析也不利。总的来说，还是为了方便。</li>
+</ul>
+<h2 id="3-SPP和BLE是什么？"><a href="#3-SPP和BLE是什么？" class="headerlink" title="3. SPP和BLE是什么？"></a>3. SPP和BLE是什么？</h2><p>在我们开始逆向工作前，我们不得不先来了解一下蓝牙模块的这两种通讯方式，由于通信方式上的差异，APP中向设备发送数据的实现方法也就截然不同，因此我们需要简单的了解下这两种通信方式。  </p>
+<p>BLE（Bluetooth Low Energy，蓝牙低功耗）和 SPP（Serial Port Profile，串行端口协议）是两种不同的蓝牙通信方式，主要区别在于它们的设计目的、应用场景和工作方式。  </p>
+<h3 id="1-BLE（Bluetooth-Low-Energy）"><a href="#1-BLE（Bluetooth-Low-Energy）" class="headerlink" title="1. BLE（Bluetooth Low Energy）"></a>1. BLE（Bluetooth Low Energy）</h3><ul>
+<li>简介：BLE 是一种低功耗的蓝牙技术，设计用于需要间歇性、小数据量传输的设备，例如传感器、可穿戴设备、智能家居设备等。</li>
+<li>特点：<ul>
+<li>低功耗：BLE 设备在闲置时消耗极低的能量，非常适合需要长时间运行的设备。</li>
+<li>低数据传输量：BLE 适合传输较小的数据块，通常用于状态信息的传输，如心率、温度等。</li>
+</ul>
+</li>
+<li>适用场景：健康监测设备（如心率监测器）、物联网设备（如各家的手环，手表）、跟踪器（果子的AirTag）、智能锁等。</li>
+<li>通信方式：基于事件驱动和广播模式的通信，主要通过 GATT（Generic Attribute Profile）协议进行数据交互。</li>
+</ul>
+<h3 id="2-SPP（Serial-Port-Profile）"><a href="#2-SPP（Serial-Port-Profile）" class="headerlink" title="2. SPP（Serial Port Profile）"></a>2. SPP（Serial Port Profile）</h3><ul>
+<li>简介：SPP 是经典蓝牙的一种协议，用来模拟有线串行通信接口，主要用于在两个设备之间传输大量连续的数据。</li>
+<li>特点：<ul>
+<li>高数据传输量：SPP 支持相对较高的数据传输速率，适用于需要连续、较大数据流的场景。</li>
+</ul>
+</li>
+<li>适用场景：传统的无线串行连接替代方案，如蓝牙耳机、无线打印机、无线POS机、PDA、蓝牙串口模块等。</li>
+<li>通信方式：模拟传统串口的数据传输方式，通常是点对点的长连接，稳定且持续的传输数据。</li>
+</ul>
+<h3 id="3-两者的区别"><a href="#3-两者的区别" class="headerlink" title="3. 两者的区别"></a>3. 两者的区别</h3><table>
+<thead>
+<tr>
+<th><strong>特性</strong></th>
+<th><strong>BLE</strong></th>
+<th><strong>SPP</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>功耗</strong></td>
+<td>低</td>
+<td>较高</td>
+</tr>
+<tr>
+<td><strong>数据量</strong></td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td><strong>通信方式</strong></td>
+<td>事件驱动，广播模式</td>
+<td>点对点，持续连接</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>可穿戴设备，传感器</td>
+<td>需要连续数据传输的设备，如无线串口设备</td>
+</tr>
+<tr>
+<td><strong>传输协议</strong></td>
+<td>GATT</td>
+<td>串口通讯</td>
+</tr>
+</tbody></table>
 
                     
                 </div>
@@ -385,11 +381,11 @@
     <div class="copyright-info-content border-box">
         <div class="copyright-info-top border-box">
             <div class="copyright-post-title border-box text-ellipsis">
-                记一次简单的VUE+UniAPP逆向分析过程
+                一次华为蓝牙耳机SPP通讯的逆向之旅
             </div>
 
             <div class="copyright-post-link border-box text-ellipsis">
-                2024/07/05/A-simple-reverse-UNIAPP-analysis/
+                2024/09/17/A-reverse-journey-of-Huawei-Bluetooth-headset-SPP-communication/
             </div>
         </div>
 
@@ -405,7 +401,7 @@
                 <div class="type">
                     发布于
                 </div>
-                <div class="content">2024-07-05 13:29</div>
+                <div class="content">2024-09-17 20:01</div>
             </div>
 
 
@@ -472,22 +468,22 @@
                 
                     <div class="post-nav border-box">
                         
-                            <div class="prev-post">
-                                <a class="prev"
-                                   rel="prev"
-                                   href="/2024/08/01/Customize-UEFI-boot-logo-for-insyde-BIOS/"
-                                   title="分离机械革命笔记本电脑的EXE格式BIOS固件，并修改Insyde BIOS的UEFI启动logo"
+                        
+                            <div class="next-post">
+                                <a class="next"
+                                   rel="next"
+                                   href="/2024/09/17/Edit-the-response-in-the-chromium/"
+                                   title="简记在Chromium内核浏览器上编辑网络请求"
                                 >
-                                    <span class="left arrow-icon flex-center">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </span>
                                     <span class="title flex-center">
-                                        <span class="post-nav-title-item text-ellipsis">分离机械革命笔记本电脑的EXE格式BIOS固件，并修改Insyde BIOS的UEFI启动logo</span>
-                                        <span class="post-nav-item">上一篇</span>
+                                        <span class="post-nav-title-item text-ellipsis">简记在Chromium内核浏览器上编辑网络请求</span>
+                                        <span class="post-nav-item">下一篇</span>
+                                    </span>
+                                    <span class="right arrow-icon flex-center">
+                                        <i class="fas fa-chevron-right"></i>
                                     </span>
                                 </a>
                             </div>
-                        
                         
                     </div>
                 
@@ -508,7 +504,7 @@
             <div class="pc-post-toc right-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%86%9F%E6%82%89"><span class="nav-text">1. 熟悉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E6%9E%90"><span class="nav-text">2. 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%9D%99%E6%80%81%E9%80%86%E5%90%91%E5%88%86%E6%9E%90"><span class="nav-text">3. 静态逆向分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%89%93%E5%8C%85%E6%B5%8B%E8%AF%95"><span class="nav-text">4. 打包测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final"><span class="nav-text">Final:</span></a></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%8E%E5%93%AA%E9%87%8C%E5%85%A5%E6%89%8B%EF%BC%9F"><span class="nav-text">1. 从哪里入手？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%99%BA%E6%85%A7%E9%9F%B3%E9%A2%91APP-%EF%BC%9F"><span class="nav-text">2. 智慧音频APP ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SPP%E5%92%8CBLE%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-text">3. SPP和BLE是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-BLE%EF%BC%88Bluetooth-Low-Energy%EF%BC%89"><span class="nav-text">1. BLE（Bluetooth Low Energy）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-SPP%EF%BC%88Serial-Port-Profile%EF%BC%89"><span class="nav-text">2. SPP（Serial Port Profile）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B8%A4%E8%80%85%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">3. 两者的区别</span></a></li></ol></li></ol>
     </div>
 </div>
 
@@ -686,7 +682,7 @@
             <div class="tablet-post-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%86%9F%E6%82%89"><span class="nav-text">1. 熟悉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E6%9E%90"><span class="nav-text">2. 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%9D%99%E6%80%81%E9%80%86%E5%90%91%E5%88%86%E6%9E%90"><span class="nav-text">3. 静态逆向分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%89%93%E5%8C%85%E6%B5%8B%E8%AF%95"><span class="nav-text">4. 打包测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final"><span class="nav-text">Final:</span></a></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%8E%E5%93%AA%E9%87%8C%E5%85%A5%E6%89%8B%EF%BC%9F"><span class="nav-text">1. 从哪里入手？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%99%BA%E6%85%A7%E9%9F%B3%E9%A2%91APP-%EF%BC%9F"><span class="nav-text">2. 智慧音频APP ？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-SPP%E5%92%8CBLE%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-text">3. SPP和BLE是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-BLE%EF%BC%88Bluetooth-Low-Energy%EF%BC%89"><span class="nav-text">1. BLE（Bluetooth Low Energy）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-SPP%EF%BC%88Serial-Port-Profile%EF%BC%89"><span class="nav-text">2. SPP（Serial Port Profile）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%B8%A4%E8%80%85%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">3. 两者的区别</span></a></li></ol></li></ol>
     </div>
 </div>
 
