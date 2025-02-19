@@ -47,6 +47,7 @@ TTL转USB模块            ToF模块
 ![引脚定义](https://github.com/SaKongA/picx-images-hosting/raw/master/引脚定义.41y6q0udv9.webp)
 
 > 我们使用串口通信，所以这里就只用接 TX RX GND VIN 即可，至于 SCL SDA 是 IIC 通信会用到的引脚，可以不接悬空。
+  
 3. 在连接好后，使用串口调试工具打开端口，设置以下串口信息：
 ```
 默认波特率：115200
