@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="SaKongA">
+    
+    <title>
+        
+            快速入门在STM32标准库上的ToF激光测距传感器 - VL6180 |
+        
+        LostZone
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+        <link rel="shortcut icon" href="/images/logo.svg">
+    
+    
+<link rel="stylesheet" href="/font/css/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/regular.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/solid.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/brands.min.css">
+
+    
+        
+            
+                
+<link rel="stylesheet" href="/css/custom.css">
+
+            
+        
+    
+    <script class="keep-theme-configurations">
+    const KEEP = window.KEEP || {}
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#0066cc","title":"LostZone","author":"SaKongA","avatar":"/images/avatar.svg","logo":"/images/logo.svg","favicon":"/images/logo.svg"},"menu":{"home":"/ || fa-solid fa-home","archives":"/archives || fa-solid fa-box-archive","tools":"/tools || fa-solid fa-link","about":"/about || fa-solid fa-user-graduate"},"first_screen":{"enable":true,"background_img":"/images/bg.svg","background_img_dark":"/images/bg.svg","description":"人生如逆旅，我亦是行人。","hitokoto":true},"social_contact":{"enable":true,"links":{"github":"https://github.com/SaKongA","telegram":"https://t.me/SaKongA"}},"scroll":{"progress_bar":true,"percent":true,"hide_header":true},"home":{"announcement":null,"category":true,"tag":true,"post_datetime":"updated"},"post":{"author_badge":{"enable":true,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"wordcount":true,"min2read":true},"datetime_format":"YYYY-MM-DD HH:mm:ss","copyright_info":true,"share":true,"reward":{"enable":false,"img_link":null,"text":null}},"code_block":{"tools":{"enable":true,"style":"mac"},"highlight_theme":"default"},"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true,"layout":"right"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":true,"site_pv":true,"page_pv":true}},"local_search":{"enable":true,"preload":true},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"1.6.21"},"waline":{"server_url":null,"reaction":false,"version":2},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":false},"lazyload":{"enable":true},"cdn":{"enable":false,"provider":"cdnjs"},"pjax":{"enable":true},"footer":{"since":2023,"word_count":true,"icp":{"enable":false,"record_code":null,"url":"https://beian.miit.gov.cn"},"site_deploy":{"enable":false,"provider":"github","url":null},"shields_style":{"enable":false,"custom":[{"link_url":null,"img_url":null}]}},"inject":{"enable":true,"css":["/css/custom.css"],"js":[null]},"root":"","source_data":{"links":[{"title":"阿空的工具箱"},{"name":"Classes2Ics","link":"https://blog.lostzone.cn/Classes2Ics/index.html","description":"快速将课程表转为ICS格式","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/classes.73uc0bc0bq.webp"},{"name":"Json+Js Formatter","link":"https://blog.lostzone.cn/codeBeautify/index.html","description":"简单的Json/JavaScript格式化工具","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/SkillIconsJavascript.99t9dwmt8p.webp"},{"name":"Upper","link":"https://github.com/SaKongA/Upper","description":"一个简洁的小红书蒲公英账号运营批量概览程序","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/upper-icon.2doo67kbft.webp"}]},"version":"4.2.5"}
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
+    KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
+    KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <i class="pjax-progress-icon fas fa-circle-notch fa-spin"></i>
+    
+</div>
+
+
+
+<main class="page-container border-box">
+    <!-- home first screen  -->
+    
+
+    <!-- page content -->
+    <div class="page-main-content border-box">
+        <div class="page-main-content-top">
+            
+<header class="header-wrapper">
+
+    <div class="border-box header-content">
+        <div class="left flex-start border-box">
+            
+                <a class="logo-image border-box" href="/">
+                    <img src="/images/logo.svg">
+                </a>
+            
+            <a class="site-name border-box" href="/">
+               LostZone
+            </a>
+        </div>
+
+        <div class="right border-box">
+            <div class="pc border-box">
+                <ul class="menu-list border-box">
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-home"></i>
+                                
+                                首页
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/archives">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-box-archive"></i>
+                                
+                                归档
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/tools">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-link"></i>
+                                
+                                工具
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/about">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-user-graduate"></i>
+                                
+                                关于
+                                
+                            </a>
+                            
+                        </li>
+                    
+                    
+                        <li class="menu-item search search-popup-trigger">
+                            <i class="menu-text-color fas search fa-search"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <div class="mobile border-box flex-start">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fas fa-search"></i></div>
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list border-box">
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-home"></i>
+                                </span>
+                            
+                            首页
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/archives">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-box-archive"></i>
+                                </span>
+                            
+                            归档
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/tools">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-link"></i>
+                                </span>
+                            
+                            工具
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/about">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-user-graduate"></i>
+                                </span>
+                            
+                            关于
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle border-box">
+
+            <div class="main-content border-box">
+                
+
+                    
+<div class="fade-in-down-animation">
+    <div class="post-page-container border-box">
+        <div class="post-content-container border-box">
+            
+
+            <div class="post-content-bottom border-box">
+                
+                    <div class="post-title">
+                        快速入门在STM32标准库上的ToF激光测距传感器 - VL6180
+                    </div>
+                
+
+                
+                    <div class="post-header border-box">
+                        
+                            <div class="avatar-box border-box">
+                                <img src="/images/avatar.svg">
+                            </div>
+                        
+                        <div class="info-box">
+                            <div class="author border-box">
+                                <span class="name">SaKongA</span>
+                                
+                                    <span class="author-badge">Lv1</span>
+                                
+                            </div>
+                            <div class="meta-info border-box">
+                                
+
+<div class="post-meta-info-container border-box post">
+    <div class="post-meta-info border-box">
+        
+
+        
+            <span class="meta-info-item post-create-date">
+                <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
+                <span class="datetime">2025-02-19 15:12:00</span>
+            </span>
+
+            
+                <span class="meta-info-item post-update-date">
+                    <i class="icon fa-solid fa-file-pen"></i>&nbsp;
+                    <span class="datetime" data-updated="Wed Feb 19 2025 15:12:00 GMT+0800">2025-02-19 15:12:00</span>
+                </span>
+            
+        
+
+        
+
+        
+
+        
+        
+        
+        
+            <span class="meta-info-item post-pv">
+                <i class="icon fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    </div>
+
+    
+</div>
+
+                            </div>
+                        </div>
+                    </div>
+                
+
+                <div class="post-content keep-markdown-body ">
+                    
+
+                    
+                         <h2 id="为什么是它？"><a href="#为什么是它？" class="headerlink" title="为什么是它？"></a>为什么是它？</h2><p>这段时间参与了一个项目的控制部分的开发，需要一个STM32F103C8T6上的测距方案，要求精度高，测量的距离比较近，测量的目标点比较集中。常见的测距方案主要分为三类：超声波测距，红外测距，ToF激光测距。在最初的计划阶段，我们选择的是超声波测距，但是由于数据很不稳定，测量点不好把握，遂放弃；由于红外测距和ToF都是基于光学测距，为了节约时间，选择了成本较高，理论上效果更好的ToF激光测距，下面是对三种测距方案的简单比较：</p>
+<table>
+<thead>
+<tr>
+<th>测距方案</th>
+<th>常见型号</th>
+<th>应用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>超声波</td>
+<td>HC-SR04, US-100, MaxBotix MB1010, Parallax PING</td>
+<td>中短距离测量，个人认为超声波更适合小车避障</td>
+</tr>
+<tr>
+<td>红外</td>
+<td>Sharp GP2Y0A21YK0F, TCRT5000, GP2Y0A02YK0F, GP2Y0A710K0F</td>
+<td>短距离测量，适用于简单的距离检测，比较容易受到外界环境的影响</td>
+</tr>
+<tr>
+<td>TOF激光</td>
+<td>VL53L0(X), VL6180(X), VL53L1(X), LIDAR-Lite v3, Garmin LIDAR-Lite v4</td>
+<td>高精度和长距离测量，适用于复杂环境，比较适合单点测距，速度也比较快，价格高</td>
+</tr>
+</tbody></table>
+<h2 id="初识-ToF-激光测距模块"><a href="#初识-ToF-激光测距模块" class="headerlink" title="初识 ToF 激光测距模块"></a>初识 ToF 激光测距模块</h2><ul>
+<li>Time of Flight, ToF，全称激光测距模块，是一种基于飞行时间原理的测距设备，说白了，就是通过激光的传播的时间来计算距离。</li>
+<li>其核心工作原理是模块发射一束激光脉冲，激光遇到目标物体后反射回来，模块接收反射光并计算发射与接收的时间差，结合光速计算出距离。</li>
+</ul>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/TOF%E5%8E%9F%E7%90%86%E7%A4%BA%E4%BE%8B.7zqk6okadv.webp"
+                        alt="原理图示例"
+                 ></p>
+<ul>
+<li>TOF激光测距模块通常由激光发射器、接收器、计时电路和处理器组成，具有高精度、快速响应、非接触测量和适应性强等优点，广泛应用于机器人、自动驾驶、工业自动化和消费电子等领域。然而，在使用时需要注意环境光干扰、目标表面特性以及功耗与散热等问题，以确保测量的准确性和稳定性。</li>
+</ul>
+<h2 id="我的模块-VL6180"><a href="#我的模块-VL6180" class="headerlink" title="我的模块 - VL6180"></a>我的模块 - VL6180</h2><ul>
+<li>购入链接：<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">【淘宝】7天无理由退货 https://e.tb.cn/h.TIV1eeWtEyhISCl?tk=jQVheiyVK3h HU006 「ToF激光测距传感器模块 TOF050C/050F/200C/200F/400F串口IIC模块」</span><br><span class="line">点击链接直接打开 或者 淘宝搜索直接打开</span><br></pre></td></tr></table></figure></li>
+<li>店家提供了多款激光测距模块，具体区别可以看下图，主要关注一下测量距离和测量盲区，我们选用的是使用VL6180的TOF05F</li>
+</ul>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E4%B8%8D%E5%90%8C%E7%9A%84TOF%E6%A8%A1%E5%9D%97.77dooycfax.webp"
+                        alt="不同的ToF模块"
+                 ></p>
+<ul>
+<li>我们可以看到三种模块都支持三种通讯方式，但是不同的芯片的寄存器有所区别，而IIC通讯主要就是通过读写寄存器达到通讯的目的，故这里不介绍IIC通信，不过需要吐槽的是，商家提供的例程里面，都是什么乱七八糟的代码，小白看了绝对一脸懵逼。。我们主要使用串口通信，至于Modbus其实就是串口通信的一个衍生，具工作模式介绍如下：</li>
+</ul>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E4%B8%89%E7%A7%8D%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F.86ts272ngl.webp"
+                        alt="三种工作模式"
+                 ></p>
+<h2 id="如何连接？"><a href="#如何连接？" class="headerlink" title="如何连接？"></a>如何连接？</h2><ol>
+<li>我们购买这家的模块的时候，尽量购买已经焊好排座的版本，商家也会附赠一个排线，排线一端为带有防反插的接口，另一端为普通的杜邦线母口，可以直连单片机；</li>
+<li>在开始之前，我们先使用TTL转USB工具简单的测试一下模块好坏，来看一下相关的引脚定义，如果你也是购买的这家的模块，可以直接按照颜色比对，否则需要按照相关标识和说明连接：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TTL转USB模块            ToF模块</span><br><span class="line">    RX-------------------TX</span><br><span class="line">    TX-------------------RX</span><br><span class="line">    3V3------------------VIN</span><br><span class="line">    GND------------------GND</span><br></pre></td></tr></table></figure>
+<img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E5%BC%95%E8%84%9A%E5%AE%9A%E4%B9%89.41y6q0udv9.webp"
+                        alt="引脚定义"
+                 ></li>
+</ol>
+<blockquote>
+<p>我们使用串口通信，所以这里就只用接 TX RX GND VIN 即可，至于 SCL SDA 是 IIC 通信会用到的引脚，可以不接悬空。</p>
+</blockquote>
+<ol start="3">
+<li>在连接好后，使用串口调试工具打开端口，设置以下串口信息：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">默认波特率：115200</span><br><span class="line">数据位：8</span><br><span class="line">校验位：无</span><br><span class="line">停止位：1</span><br><span class="line">流控制：无</span><br></pre></td></tr></table></figure></li>
+<li>我们直接显示 HEX 16 进制原始数据，开启显示时间戳，可以获取到数据格式如下的数据：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">01 03 02 00 a2 39 jk</span><br><span class="line">01 03 02 00 a2 39 fd</span><br><span class="line">01 03 02 00 a2 39 as</span><br><span class="line">01 03 02 00 a2 39 dd</span><br><span class="line">01 03 02 00 a2 39 gg</span><br><span class="line">01 03 02 00 a2 39 ds</span><br><span class="line">01 03 02 00 a2 39 we</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="原始数据的解析"><a href="#原始数据的解析" class="headerlink" title="原始数据的解析"></a>原始数据的解析</h2><ol>
+<li>上面我们获取到了源源不断的传感器返回的数据，这种数据就是Modbus格式的串口数据了，我们这里目的是快速入门ToF模块，所以就不详细介绍Modbuds格式是什么了，我们来直接拆解这些数据，看看都是什么意思，首先来看一下Modbus格式的数据最基本的构成：</li>
+</ol>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/modbus%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F.5xarinpma1.webp"
+                        alt="Modbus数据格式"
+                 ></p>
+<ol start="2">
+<li>我们把数据对应上去就可以了，拿 01 03 02 00 a2 39 we 举例，从机地址就是 01 ，也就是 0x01，功能号为 0x03，数据字节个数为 0x02，所以后面要数两个格子的数据，分别是 00 和 a2 ,组成的16进制数据就是 0x00a2，这里就是我们的核心数据了，而后面的 39 we，是CRC校验位，主要是校验数据完整性，我们就不用看了。</li>
+</ol>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/modbus%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F.m7bnk8v2.webp"
+                        alt="Modbus数据填入"
+                 ><br>3. 我们将 0x00a2 从16进制转为10进制为 162，单位为毫米（mm），从而得到了我们的距离，知道了原理之后，我们就可以实战了！</p>
+<h2 id="在STM32标准库上的实战"><a href="#在STM32标准库上的实战" class="headerlink" title="在STM32标准库上的实战"></a>在STM32标准库上的实战</h2><ol start="0">
+<li><p>我写驱动代码的原则和目标就是：在代码尽可能的精简下，完成我们需要的目标，不需要的东西不要乱加，所以，需要其他定制功能，请优先在驱动代码以外的调用处解决，实在不行再修改驱动代码；</p>
+</li>
+<li><p>本次实战使用STM32F103C8T6标准库进行开发，编译器为Arm Complier 5.06，我们这里使用的是江科大的0.96寸四针OLED屏幕驱动代码的示例工程源码，以此为底板进行开发，首先在Hardware下创建相关驱动文件 TOF.c 和 TOF.h；</p>
+</li>
+<li><p>创建一个模块和串口通信初始化函数<code>TOF_Init();</code>，我们这里使用USART2为通信串口，优先级为3，使用的时候，注意不要与其他模块的串口冲突，不过冲突了也会编译报错的~ 我们这里定义的引脚为PA2与PA3，这两个引脚为USART2默认引脚：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    GPIO_InitTypeDef GPIO_InitStructure;</span><br><span class="line">    USART_InitTypeDef USART_InitStructure;</span><br><span class="line">    NVIC_InitTypeDef NVIC_InitStructure;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能时钟</span></span><br><span class="line">    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);</span><br><span class="line">    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置GPIO</span></span><br><span class="line">    <span class="comment">// PA2 - USART2_TX</span></span><br><span class="line">    <span class="comment">// PA3 - USART2_RX</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;</span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;</span><br><span class="line">    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;</span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line">    </span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;</span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;</span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置USART2</span></span><br><span class="line">    USART_InitStructure.USART_BaudRate = <span class="number">115200</span>;</span><br><span class="line">    USART_InitStructure.USART_WordLength = USART_WordLength_8b;</span><br><span class="line">    USART_InitStructure.USART_StopBits = USART_StopBits_1;</span><br><span class="line">    USART_InitStructure.USART_Parity = USART_Parity_No;</span><br><span class="line">    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;</span><br><span class="line">    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;</span><br><span class="line">    USART_Init(USART2, &amp;USART_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置NVIC</span></span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = <span class="number">3</span>;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelSubPriority = <span class="number">3</span>;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;</span><br><span class="line">    NVIC_Init(&amp;NVIC_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能USART2接收中断</span></span><br><span class="line">    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能USART2</span></span><br><span class="line">    USART_Cmd(USART2, ENABLE);</span><br><span class="line"></span><br><span class="line">    TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// USART2中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART2_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">uint8_t</span> data = USART_ReceiveData(USART2);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(TOF_RxIndex &lt; <span class="number">7</span>)  <span class="comment">// Modbus帧长度为7字节</span></span><br><span class="line">        &#123;</span><br><span class="line">            TOF_RxBuffer[TOF_RxIndex++] = data;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span>(TOF_RxIndex == <span class="number">7</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                TOF_DataReady = <span class="number">1</span>;</span><br><span class="line">                TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        USART_ClearITPendingBit(USART2, USART_IT_RXNE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __TOF_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __TOF_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32f10x.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数声明</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>为我们的串口添加串口终端处理；新建一个串口终端标志为<code>TOF_RxIndex</code>;新建一个标志位<code>TOF_DataReady</code>，表示数据已经接收完毕了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_RxIndex = <span class="number">0</span>;  <span class="comment">// 定义串口中断标志位</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_DataReady = <span class="number">0</span>;  <span class="comment">// 定义数据接收完毕标志位</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">    TOF_RxIndex = <span class="number">0</span>;   <span class="comment">// 添加串口中断标志位</span></span><br><span class="line">    TOF_DataReady = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// USART2中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART2_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">uint8_t</span> data = USART_ReceiveData(USART2);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(TOF_RxIndex &lt; <span class="number">7</span>)  <span class="comment">// Modbus帧长度为7字节</span></span><br><span class="line">        &#123;</span><br><span class="line">            TOF_RxBuffer[TOF_RxIndex++] = data;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span>(TOF_RxIndex == <span class="number">7</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                TOF_DataReady = <span class="number">1</span>;</span><br><span class="line">                TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        USART_ClearITPendingBit(USART2, USART_IT_RXNE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>然后，我们来创建一个缓冲区，用来存放我们每次测量的数据，方便后面对数据进行转化；新建一个函数<code>TOF_DataIsValid();</code>，来检查我们接收到的缓冲区数据是否有效：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_RxBuffer[<span class="number">8</span>];  <span class="comment">// Modbus格式：01 03 02 XX XX CRC CRC</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查接收到的数据是否有效</span></span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(!TOF_DataReady) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查帧格式</span></span><br><span class="line">    <span class="keyword">if</span>(TOF_RxBuffer[<span class="number">0</span>] != <span class="number">0x01</span> || TOF_RxBuffer[<span class="number">1</span>] != <span class="number">0x03</span> || TOF_RxBuffer[<span class="number">2</span>] != <span class="number">0x02</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查CRC</span></span><br><span class="line">    <span class="type">uint16_t</span> receivedCRC = (TOF_RxBuffer[<span class="number">6</span>] &lt;&lt; <span class="number">8</span>) | TOF_RxBuffer[<span class="number">5</span>];</span><br><span class="line">    <span class="type">uint16_t</span> calculatedCRC = ModbusCRC16(TOF_RxBuffer, <span class="number">5</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (receivedCRC == calculatedCRC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算Modbus CRC16</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint16_t</span> <span class="title function_">ModbusCRC16</span><span class="params">(<span class="type">uint8_t</span> *data, <span class="type">uint8_t</span> length)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint16_t</span> crc = <span class="number">0xFFFF</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span>(<span class="type">uint8_t</span> i = <span class="number">0</span>; i &lt; length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        crc ^= data[i];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">uint8_t</span> j = <span class="number">0</span>; j &lt; <span class="number">8</span>; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(crc &amp; <span class="number">0x0001</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                crc &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">                crc ^= <span class="number">0xA001</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                crc &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> crc;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// USART2中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART2_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __TOF_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __TOF_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32f10x.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数声明</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>现在我们来完成获取距离的函数<code>TOF_GetDistance</code>，由于模块有的时候工作不稳定，会回复距离为0的时候，我们这里也使用正确标志位来处理数据不正常的情况：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.c</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;Delay.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint16_t</span> LastValidDistance = <span class="number">0</span>;  <span class="comment">// 保存上一次的有效距离值</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查接收到的数据是否有效</span></span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算Modbus CRC16</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint16_t</span> <span class="title function_">ModbusCRC16</span><span class="params">(<span class="type">uint8_t</span> *data, <span class="type">uint8_t</span> length)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取距离值</span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">TOF_GetDistance</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint16_t</span> distance = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(TOF_DataIsValid())</span><br><span class="line">    &#123;</span><br><span class="line">        distance = (TOF_RxBuffer[<span class="number">3</span>] &lt;&lt; <span class="number">8</span>) | TOF_RxBuffer[<span class="number">4</span>];</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 只有当测量值大于0时才更新LastValidDistance</span></span><br><span class="line">        <span class="keyword">if</span>(distance &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            LastValidDistance = distance;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            distance = LastValidDistance;  <span class="comment">// 如果当前值为0，返回上一个有效值</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        TOF_DataReady = <span class="number">0</span>;  <span class="comment">// 清除数据就绪标志</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        distance = LastValidDistance;  <span class="comment">// 如果数据无效，返回上一个有效值</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> distance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// USART2中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART2_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ······ 此处省略其他代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __TOF_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __TOF_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32f10x.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数声明</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">TOF_GetDistance</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>到这里我们的驱动就完成了，本质上就是一个简单的串口接收数据的功能，相比<code>IIC</code>实现要简单很多，<code>IIC</code>还要涉及到寄存器地址等内容，以下是完整代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.c</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;Delay.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 接收缓冲区</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_RxBuffer[<span class="number">8</span>];  <span class="comment">// Modbus格式：01 03 02 XX XX CRC CRC</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">uint8_t</span> TOF_DataReady = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">uint16_t</span> LastValidDistance = <span class="number">0</span>;  <span class="comment">// 保存上一次的有效距离值</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    GPIO_InitTypeDef GPIO_InitStructure;</span><br><span class="line">    USART_InitTypeDef USART_InitStructure;</span><br><span class="line">    NVIC_InitTypeDef NVIC_InitStructure;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能时钟</span></span><br><span class="line">    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);</span><br><span class="line">    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置GPIO</span></span><br><span class="line">    <span class="comment">// PA2 - USART2_TX</span></span><br><span class="line">    <span class="comment">// PA3 - USART2_RX</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;</span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;</span><br><span class="line">    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;</span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line">    </span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;</span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;</span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置USART2</span></span><br><span class="line">    USART_InitStructure.USART_BaudRate = <span class="number">115200</span>;</span><br><span class="line">    USART_InitStructure.USART_WordLength = USART_WordLength_8b;</span><br><span class="line">    USART_InitStructure.USART_StopBits = USART_StopBits_1;</span><br><span class="line">    USART_InitStructure.USART_Parity = USART_Parity_No;</span><br><span class="line">    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;</span><br><span class="line">    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;</span><br><span class="line">    USART_Init(USART2, &amp;USART_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 配置NVIC</span></span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = <span class="number">3</span>;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelSubPriority = <span class="number">3</span>;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;</span><br><span class="line">    NVIC_Init(&amp;NVIC_InitStructure);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能USART2接收中断</span></span><br><span class="line">    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使能USART2</span></span><br><span class="line">    USART_Cmd(USART2, ENABLE);</span><br><span class="line">    </span><br><span class="line">    TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line">    TOF_DataReady = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 检查接收到的数据是否有效</span></span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(!TOF_DataReady) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查帧格式</span></span><br><span class="line">    <span class="keyword">if</span>(TOF_RxBuffer[<span class="number">0</span>] != <span class="number">0x01</span> || TOF_RxBuffer[<span class="number">1</span>] != <span class="number">0x03</span> || TOF_RxBuffer[<span class="number">2</span>] != <span class="number">0x02</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查CRC</span></span><br><span class="line">    <span class="type">uint16_t</span> receivedCRC = (TOF_RxBuffer[<span class="number">6</span>] &lt;&lt; <span class="number">8</span>) | TOF_RxBuffer[<span class="number">5</span>];</span><br><span class="line">    <span class="type">uint16_t</span> calculatedCRC = ModbusCRC16(TOF_RxBuffer, <span class="number">5</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> (receivedCRC == calculatedCRC);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算Modbus CRC16</span></span><br><span class="line"><span class="type">static</span> <span class="type">uint16_t</span> <span class="title function_">ModbusCRC16</span><span class="params">(<span class="type">uint8_t</span> *data, <span class="type">uint8_t</span> length)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint16_t</span> crc = <span class="number">0xFFFF</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span>(<span class="type">uint8_t</span> i = <span class="number">0</span>; i &lt; length; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        crc ^= data[i];</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">uint8_t</span> j = <span class="number">0</span>; j &lt; <span class="number">8</span>; j++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(crc &amp; <span class="number">0x0001</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                crc &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">                crc ^= <span class="number">0xA001</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                crc &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> crc;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取距离值</span></span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">TOF_GetDistance</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint16_t</span> distance = <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(TOF_DataIsValid())</span><br><span class="line">    &#123;</span><br><span class="line">        distance = (TOF_RxBuffer[<span class="number">3</span>] &lt;&lt; <span class="number">8</span>) | TOF_RxBuffer[<span class="number">4</span>];</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 只有当测量值大于0时才更新LastValidDistance</span></span><br><span class="line">        <span class="keyword">if</span>(distance &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            LastValidDistance = distance;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            distance = LastValidDistance;  <span class="comment">// 如果当前值为0，返回上一个有效值</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        TOF_DataReady = <span class="number">0</span>;  <span class="comment">// 清除数据就绪标志</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        distance = LastValidDistance;  <span class="comment">// 如果数据无效，返回上一个有效值</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> distance;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// USART2中断服务函数</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">USART2_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">uint8_t</span> data = USART_ReceiveData(USART2);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span>(TOF_RxIndex &lt; <span class="number">7</span>)  <span class="comment">// Modbus帧长度为7字节</span></span><br><span class="line">        &#123;</span><br><span class="line">            TOF_RxBuffer[TOF_RxIndex++] = data;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span>(TOF_RxIndex == <span class="number">7</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                TOF_DataReady = <span class="number">1</span>;</span><br><span class="line">                TOF_RxIndex = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        USART_ClearITPendingBit(USART2, USART_IT_RXNE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Hardware/TOF.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> __TOF_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __TOF_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32f10x.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数声明</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">TOF_Init</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint16_t</span> <span class="title function_">TOF_GetDistance</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">uint8_t</span> <span class="title function_">TOF_DataIsValid</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>最后的最后，就是调用的问题，我们这里将数据实时显示到了OLED屏幕上，可以参考一下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// User/main.c</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stm32f10x.h&quot;</span> <span class="comment">// Device header</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;OLED.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;TOF.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	OLED_Init();  <span class="comment">// 初始化OLED屏幕</span></span><br><span class="line">	TOF_Init();  <span class="comment">//初始化TOF测距模块</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="type">uint16_t</span> distance = TOF_GetDistance();  <span class="comment">// 获取数值</span></span><br><span class="line">		<span class="built_in">sprintf</span>(DistanceStr, <span class="string">&quot;Distance:%4dmm&quot;</span>, distance);  <span class="comment">// 赋值</span></span><br><span class="line">		OLED_ShowString(<span class="number">0</span>, <span class="number">0</span>, DistanceStr, OLED_8X16);  <span class="comment">// 写入显示屏幕</span></span><br><span class="line">		OLED_Update();  <span class="comment">// 更新屏幕</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+                    
+                </div>
+
+                
+                        
+<div class="post-copyright-info-container border-box">
+    <div class="copyright-info-content border-box">
+        <div class="copyright-info-top border-box">
+            <div class="copyright-post-title border-box text-ellipsis">
+                快速入门在STM32标准库上的ToF激光测距传感器 - VL6180
+            </div>
+
+            <div class="copyright-post-link border-box text-ellipsis">
+                2025/02/19/Quick-Start-ToF-Laser-Distance-Sensor-VL6180/
+            </div>
+        </div>
+
+        <div class="copyright-info-bottom border-box">
+            <div class="copyright-post-author bottom-item">
+                <div class="type">
+                    作者
+                </div>
+                <div class="content">SaKongA</div>
+            </div>
+
+            <div class="post-time bottom-item">
+                <div class="type">
+                    发布于
+                </div>
+                <div class="content">2025-02-19 15:12</div>
+            </div>
+
+
+            <div class="post-license bottom-item">
+                <div class="type">
+                    许可
+                </div>
+                <div class="content tooltip" data-tooltip-content="CC BY-NC-SA 4.0">
+                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">
+                        
+                            <i class="fa-brands fa-creative-commons"></i>
+                            <i class="fa-brands fa-creative-commons-by"></i>
+                            <i class="fa-brands fa-creative-commons-nc"></i>
+                            <i class="fa-brands fa-creative-commons-sa"></i>
+                        
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <i class="copyright-bg fa-solid fa-copyright"></i>
+    </div>
+    <div class="copy-copyright-info flex-center tooltip" data-tooltip-content="复制版权信息" data-tooltip-offset-y="-2px">
+        <i class="fa-solid fa-copy"></i>
+    </div>
+</div>
+
+                
+
+                <div class="post-bottom-tags-and-share border-box">
+                    <div>
+                        
+                    </div>
+                    <div>
+                        
+                            <div class="post-share-container border-box">
+    <ul class="share-list-wrap border-box">
+        <li class="qq share-item border-box flex-center tooltip"
+            data-tooltip-content="分享到 QQ"
+        >
+            <i class="fa-brands fa-qq"></i>
+        </li>
+        <li class="wechat share-item border-box flex-center tooltip tooltip-img"
+            data-tooltip-content="分享到微信"
+            data-tooltip-img-tip="微信扫一扫"
+            data-tooltip-img-style="background-color: #fff; top: -10px; padding: 0.6rem 0.6rem 0.1rem 0.6rem;"
+        >
+            <i class="fa-brands fa-weixin"></i>
+        </li>
+        <li class="weibo share-item border-box flex-center tooltip"
+            data-tooltip-content="分享到微博"
+        >
+            <i class="fa-brands fa-weibo"></i>
+        </li>
+    </ul>
+</div>
+
+                        
+                    </div>
+                </div>
+
+                
+
+                
+                    <div class="post-nav border-box">
+                        
+                        
+                            <div class="next-post">
+                                <a class="next"
+                                   rel="next"
+                                   href="/2024/11/24/Two-way-servo-garbage-sorting-project/"
+                                   title="MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析"
+                                >
+                                    <span class="title flex-center">
+                                        <span class="post-nav-title-item text-ellipsis">MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析</span>
+                                        <span class="post-nav-item">下一篇</span>
+                                    </span>
+                                    <span class="right arrow-icon flex-center">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </div>
+                        
+                    </div>
+                
+
+                
+                    
+
+
+
+
+
+
+                
+            </div>
+        </div>
+
+        
+            <div class="pc-post-toc right-toc">
+                <div class="post-toc-wrap border-box">
+    <div class="post-toc border-box">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%AE%83%EF%BC%9F"><span class="nav-text">为什么是它？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E8%AF%86-ToF-%E6%BF%80%E5%85%89%E6%B5%8B%E8%B7%9D%E6%A8%A1%E5%9D%97"><span class="nav-text">初识 ToF 激光测距模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%9A%84%E6%A8%A1%E5%9D%97-VL6180"><span class="nav-text">我的模块 - VL6180</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9E%E6%8E%A5%EF%BC%9F"><span class="nav-text">如何连接？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="nav-text">原始数据的解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8STM32%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%8A%E7%9A%84%E5%AE%9E%E6%88%98"><span class="nav-text">在STM32标准库上的实战</span></a></li></ol>
+    </div>
+</div>
+
+            </div>
+        
+    </div>
+</div>
+
+
+                
+            </div>
+        </div>
+
+        <div class="page-main-content-bottom border-box">
+            
+<footer class="footer border-box">
+    <div class="copyright-info info-item">
+    &copy;&nbsp;<span>2023</span>&nbsp;-&nbsp;2025
+    
+            &nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;&nbsp;<a href="/">SaKongA</a>
+        
+    </div>
+
+    <div class="theme-info info-item">
+        由&nbsp;<a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;驱动&nbsp;&&nbsp;主题&nbsp;<a class="keep-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep</a>
+    </div>
+
+    
+
+    
+        <div class="count-info info-item">
+            
+
+            
+                <span class="count-item border-box uv">
+                    <span class="item-type border-box">访客数</span>
+                    <span class="item-value border-box uv" id="busuanzi_value_site_uv"></span>
+                </span>
+            
+
+            
+                <span class="count-item border-box pv">
+                    <span class="item-type border-box">访问量</span>
+                    <span class="item-value border-box pv" id="busuanzi_value_site_pv"></span>
+                </span>
+            
+        </div>
+    
+
+    
+</footer>
+
+        </div>
+    </div>
+
+    <!-- post tools -->
+    
+        <div class="post-tools right-toc">
+            <div class="post-tools-container border-box">
+    <ul class="post-tools-list border-box">
+        <!-- PC encrypt again -->
+        
+
+        <!-- PC TOC show toggle -->
+        
+            <li class="tools-item flex-center toggle-show-toc">
+                <i class="fas fa-list"></i>
+            </li>
+        
+
+        <!-- PC go comment -->
+        
+
+        <!-- PC full screen -->
+        <li class="tools-item flex-center full-screen">
+            <i class="fa-solid fa-expand"></i>
+        </li>
+    </ul>
+</div>
+
+        </div>
+    
+
+    <!-- side tools -->
+    <div class="side-tools">
+        <div class="side-tools-container border-box ">
+    <ul class="side-tools-list side-tools-show-handle border-box">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <!-- toggle mode -->
+        
+            <li class="tools-item tool-toggle-theme-mode flex-center">
+                <i class="fas fa-moon"></i>
+            </li>
+        
+
+        <!-- rss -->
+        
+
+        <!-- to bottom -->
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list border-box">
+        
+            <li class="tools-item toggle-show-toc-tablet flex-center">
+                <i class="fas fa-list"></i>
+            </li>
+        
+
+        
+
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+
+        <li class="tools-item tool-scroll-to-top flex-center show-arrow">
+            <i class="arrow fas fa-arrow-up"></i>
+            <span class="percent"></span>
+        </li>
+    </ul>
+</div>
+
+    </div>
+
+    <!-- image mask -->
+    <div class="zoom-in-image-mask">
+    <img class="zoom-in-image">
+</div>
+
+
+    <!-- local search -->
+    
+        <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-input-field-pre">
+            <i class="fas fa-keyboard"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="搜索..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="close-popup-btn">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fas fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    <!-- tablet toc -->
+    
+        <div class="tablet-post-toc-mask">
+            <div class="tablet-post-toc">
+                <div class="post-toc-wrap border-box">
+    <div class="post-toc border-box">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%AE%83%EF%BC%9F"><span class="nav-text">为什么是它？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E8%AF%86-ToF-%E6%BF%80%E5%85%89%E6%B5%8B%E8%B7%9D%E6%A8%A1%E5%9D%97"><span class="nav-text">初识 ToF 激光测距模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%9A%84%E6%A8%A1%E5%9D%97-VL6180"><span class="nav-text">我的模块 - VL6180</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9E%E6%8E%A5%EF%BC%9F"><span class="nav-text">如何连接？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8B%E6%95%B0%E6%8D%AE%E7%9A%84%E8%A7%A3%E6%9E%90"><span class="nav-text">原始数据的解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8STM32%E6%A0%87%E5%87%86%E5%BA%93%E4%B8%8A%E7%9A%84%E5%AE%9E%E6%88%98"><span class="nav-text">在STM32标准库上的实战</span></a></li></ol>
+    </div>
+</div>
+
+            </div>
+        </div>
+    
+</main>
+
+
+
+
+
+<!-- common js -->
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/toggle-theme.js"></script>
+
+<script src="/js/code-block.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+
+<!-- local search -->
+
+    
+<script src="/js/local-search.js"></script>
+
+
+
+<!-- lazyload -->
+
+    
+<script src="/js/lazyload.js"></script>
+
+
+
+<div class="pjax">
+    <!-- home page -->
+    
+
+    <!-- post page -->
+    
+        <!-- post-helper -->
+        
+<script src="/js/post/post-helper.js"></script>
+
+
+        <!-- toc -->
+        
+            
+<script src="/js/post/toc.js"></script>
+
+        
+
+        <!-- copyright-info -->
+        
+            
+<script src="/js/post/copyright-info.js"></script>
+
+        
+
+        <!-- share -->
+        
+            
+<script src="/js/post/share.js"></script>
+
+        
+    
+
+    <!-- categories page -->
+    
+
+    <!-- links page -->
+    
+
+    <!-- photos page -->
+    
+
+    <!-- tools page -->
+    
+</div>
+
+<!-- mermaid -->
+
+
+<!-- pjax -->
+
+    
+<script src="/js/libs/pjax.min.js"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.pjax = new Pjax({
+            selectors: [
+                'head title',
+                '.page-container',
+                '.pjax'
+            ],
+            history: true,
+            debug: false,
+            cacheBust: false,
+            timeout: 0,
+            analytics: false,
+            currentUrlFullReload: false,
+            scrollRestoration: false,
+        });
+
+        document.addEventListener('pjax:send', () => {
+            KEEP.utils.pjaxProgressBarStart()
+        });
+
+        document.addEventListener('pjax:complete', () => {
+            KEEP.utils.pjaxProgressBarEnd()
+            window.pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'))
+            KEEP.initExecute()
+        });
+    });
+</script>
+
+
+
+
+    
+        
+    
+
+</body>
+</html>

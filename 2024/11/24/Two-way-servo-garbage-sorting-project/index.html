@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="SaKongA">
+    
+    <title>
+        
+            MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析 |
+        
+        LostZone
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+        <link rel="shortcut icon" href="/images/logo.svg">
+    
+    
+<link rel="stylesheet" href="/font/css/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/regular.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/solid.min.css">
+
+    
+<link rel="stylesheet" href="/font/css/brands.min.css">
+
+    
+        
+            
+                
+<link rel="stylesheet" href="/css/custom.css">
+
+            
+        
+    
+    <script class="keep-theme-configurations">
+    const KEEP = window.KEEP || {}
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN"}
+    KEEP.theme_config = {"base_info":{"primary_color":"#0066cc","title":"LostZone","author":"SaKongA","avatar":"/images/avatar.svg","logo":"/images/logo.svg","favicon":"/images/logo.svg"},"menu":{"home":"/ || fa-solid fa-home","archives":"/archives || fa-solid fa-box-archive","tools":"/tools || fa-solid fa-link","about":"/about || fa-solid fa-user-graduate"},"first_screen":{"enable":true,"background_img":"/images/bg.svg","background_img_dark":"/images/bg.svg","description":"人生如逆旅，我亦是行人。","hitokoto":true},"social_contact":{"enable":true,"links":{"github":"https://github.com/SaKongA","telegram":"https://t.me/SaKongA"}},"scroll":{"progress_bar":true,"percent":true,"hide_header":true},"home":{"announcement":null,"category":true,"tag":true,"post_datetime":"updated"},"post":{"author_badge":{"enable":true,"level_badge":true,"custom_badge":["One","Two","Three"]},"word_count":{"wordcount":true,"min2read":true},"datetime_format":"YYYY-MM-DD HH:mm:ss","copyright_info":true,"share":true,"reward":{"enable":false,"img_link":null,"text":null}},"code_block":{"tools":{"enable":true,"style":"mac"},"highlight_theme":"default"},"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true,"layout":"right"},"website_count":{"busuanzi_count":{"enable":true,"site_uv":true,"site_pv":true,"page_pv":true}},"local_search":{"enable":true,"preload":true},"comment":{"enable":false,"use":"valine","valine":{"appid":null,"appkey":null,"server_urls":null,"placeholder":null},"gitalk":{"github_id":null,"github_admins":null,"repository":null,"client_id":null,"client_secret":null,"proxy":null},"twikoo":{"env_id":null,"region":null,"version":"1.6.21"},"waline":{"server_url":null,"reaction":false,"version":2},"giscus":{"repo":null,"repo_id":null,"category":"Announcements","category_id":null,"reactions_enabled":false},"artalk":{"server":null},"disqus":{"shortname":null}},"rss":{"enable":false},"lazyload":{"enable":true},"cdn":{"enable":false,"provider":"cdnjs"},"pjax":{"enable":true},"footer":{"since":2023,"word_count":true,"icp":{"enable":false,"record_code":null,"url":"https://beian.miit.gov.cn"},"site_deploy":{"enable":false,"provider":"github","url":null},"shields_style":{"enable":false,"custom":[{"link_url":null,"img_url":null}]}},"inject":{"enable":true,"css":["/css/custom.css"],"js":[null]},"root":"","source_data":{"links":[{"title":"阿空的工具箱"},{"name":"Classes2Ics","link":"https://blog.lostzone.cn/Classes2Ics/index.html","description":"快速将课程表转为ICS格式","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/classes.73uc0bc0bq.webp"},{"name":"Json+Js Formatter","link":"https://blog.lostzone.cn/codeBeautify/index.html","description":"简单的Json/JavaScript格式化工具","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/SkillIconsJavascript.99t9dwmt8p.webp"},{"name":"Upper","link":"https://github.com/SaKongA/Upper","description":"一个简洁的小红书蒲公英账号运营批量概览程序","avatar":"https://github.com/SaKongA/picx-images-hosting/raw/master/upper-icon.2doo67kbft.webp"}]},"version":"4.2.5"}
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"}
+    KEEP.language_code_block = {"copy":"复制代码","copied":"已复制","fold":"折叠代码块","folded":"已折叠"}
+    KEEP.language_copy_copyright = {"copy":"复制版权信息","copied":"已复制","title":"原文标题","author":"原文作者","link":"原文链接"}
+  </script>
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+        <span class="scroll-progress-bar"></span>
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+        <i class="pjax-progress-icon fas fa-circle-notch fa-spin"></i>
+    
+</div>
+
+
+
+<main class="page-container border-box">
+    <!-- home first screen  -->
+    
+
+    <!-- page content -->
+    <div class="page-main-content border-box">
+        <div class="page-main-content-top">
+            
+<header class="header-wrapper">
+
+    <div class="border-box header-content">
+        <div class="left flex-start border-box">
+            
+                <a class="logo-image border-box" href="/">
+                    <img src="/images/logo.svg">
+                </a>
+            
+            <a class="site-name border-box" href="/">
+               LostZone
+            </a>
+        </div>
+
+        <div class="right border-box">
+            <div class="pc border-box">
+                <ul class="menu-list border-box">
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-home"></i>
+                                
+                                首页
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/archives">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-box-archive"></i>
+                                
+                                归档
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/tools">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-link"></i>
+                                
+                                工具
+                                
+                            </a>
+                            
+                        </li>
+                    
+                        
+                        <li class="menu-item flex-start border-box">
+                            <a class="menu-text-color border-box" href="/about">
+                                
+                                    <i class="menu-text-color menu-icon fa-solid fa-user-graduate"></i>
+                                
+                                关于
+                                
+                            </a>
+                            
+                        </li>
+                    
+                    
+                        <li class="menu-item search search-popup-trigger">
+                            <i class="menu-text-color fas search fa-search"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <div class="mobile border-box flex-start">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fas fa-search"></i></div>
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list border-box">
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-home"></i>
+                                </span>
+                            
+                            首页
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/archives">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-box-archive"></i>
+                                </span>
+                            
+                            归档
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/tools">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-link"></i>
+                                </span>
+                            
+                            工具
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+                
+                <li class="drawer-menu-item border-box not-sub-menu">
+                    <label class="drawer-menu-label border-box">
+                        <a class="drawer-menu-text-color left-side flex-start border-box" href="/about">
+                            
+                                <span class="menu-icon-wrap border-box flex-center">
+                                    <i class="drawer-menu-text-color menu-icon fa-solid fa-user-graduate"></i>
+                                </span>
+                            
+                            关于
+                        </a>
+                        
+                    </label>
+                    
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle border-box">
+
+            <div class="main-content border-box">
+                
+
+                    
+<div class="fade-in-down-animation">
+    <div class="post-page-container border-box">
+        <div class="post-content-container border-box">
+            
+
+            <div class="post-content-bottom border-box">
+                
+                    <div class="post-title">
+                        MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析
+                    </div>
+                
+
+                
+                    <div class="post-header border-box">
+                        
+                            <div class="avatar-box border-box">
+                                <img src="/images/avatar.svg">
+                            </div>
+                        
+                        <div class="info-box">
+                            <div class="author border-box">
+                                <span class="name">SaKongA</span>
+                                
+                                    <span class="author-badge">Lv1</span>
+                                
+                            </div>
+                            <div class="meta-info border-box">
+                                
+
+<div class="post-meta-info-container border-box post">
+    <div class="post-meta-info border-box">
+        
+
+        
+            <span class="meta-info-item post-create-date">
+                <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
+                <span class="datetime">2024-11-24 17:48:26</span>
+            </span>
+
+            
+                <span class="meta-info-item post-update-date">
+                    <i class="icon fa-solid fa-file-pen"></i>&nbsp;
+                    <span class="datetime" data-updated="Mon Nov 25 2024 00:08:16 GMT+0800">2024-11-25 00:08:16</span>
+                </span>
+            
+        
+
+        
+
+        
+
+        
+        
+        
+        
+            <span class="meta-info-item post-pv">
+                <i class="icon fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    </div>
+
+    
+</div>
+
+                            </div>
+                        </div>
+                    </div>
+                
+
+                <div class="post-content keep-markdown-body ">
+                    
+
+                    
+                         <h2 id="MaixBit-图像识别处理部分"><a href="#MaixBit-图像识别处理部分" class="headerlink" title="MaixBit - 图像识别处理部分"></a>MaixBit - 图像识别处理部分</h2><ul>
+<li><code>Path:</code> main.py</li>
+<li>代码逻辑图<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">lcd_show_except</span><br><span class="line"> ├── sys.print_exception  (格式化异常信息)</span><br><span class="line"> └── lcd.display          (将异常信息绘制到屏幕)</span><br><span class="line"></span><br><span class="line">Comm                      (处理串口通信)</span><br><span class="line"></span><br><span class="line">init_uart</span><br><span class="line"> ├── fm.register          (初始化 UART 引脚)</span><br><span class="line"> └── UART(...)            (设置 UART 参数)</span><br><span class="line"></span><br><span class="line">main</span><br><span class="line"> ├── Sensor 初始化         (传感器初始化及配置)</span><br><span class="line"> ├── LCD 初始化            (LCD 屏幕初始化及配置)</span><br><span class="line"> ├── 加载模型与标签        (加载 YOLO 模型和标签文件)</span><br><span class="line"> └── 循环检测              (持续捕获图像、运行检测、绘制结果并与 UART 通信)</span><br><span class="line"></span><br><span class="line">异常处理</span><br><span class="line"> ├── 捕获异常</span><br><span class="line"> ├── 显示异常信息</span><br><span class="line"> └── 清理资源</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="0">
+<li>MaixBit是干什么的？</li>
+</ol>
+<ul>
+<li>我们在MaixBit上进行目标检测，它加载一个 YOLO 模型，通过摄像头实时捕捉图像，并对图像中的物体进行分类和定位。检测到的物体信息会通过 UART 串口发送出去。</li>
+</ul>
+<ol>
+<li>错误信息处理部分 (此部分可以跳过)</li>
+</ol>
+<ul>
+<li>主要为格式化异常信息与将异常信息绘制到屏幕，故不解析。</li>
+</ul>
+<ol start="2">
+<li>屏幕串口通信部分</li>
+</ol>
+<ul>
+<li>Comm 类的作用是负责处理串口通信，将检测到的目标信息通过 UART (串口) 发送给MaixBit屏幕，不涉及控制部分，故不解析。</li>
+</ul>
+<ol start="3">
+<li>UART 初始化</li>
+</ol>
+<ul>
+<li>UART1的TX和RX引脚被注册到MaixPy环境，并且波特率被设置为115200;</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">init_uart</span>():</span><br><span class="line">    fm.register(<span class="number">15</span>, fm.fpioa.UART1_TX, force=<span class="literal">True</span>)</span><br><span class="line">    fm.register(<span class="number">16</span>, fm.fpioa.UART1_RX, force=<span class="literal">True</span>)</span><br><span class="line">    uart = UART(UART.UART1, <span class="number">115200</span>, <span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>, timeout=<span class="number">1000</span>, read_buf_len=<span class="number">256</span>)</span><br><span class="line">    <span class="keyword">return</span> uart</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>图像识别与 UART 物品标签信息发送</li>
+</ol>
+<ul>
+<li>此部分对于MaixBit在舵机控制部分最重要，但是main函数其实大部分代码是图像识别部分，我们只解析物品类别是如何发送的，以下为绘制检测结果并发送数据部分：</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> objects:</span><br><span class="line">    <span class="keyword">for</span> obj <span class="keyword">in</span> objects:</span><br><span class="line">        pos = obj.rect()</span><br><span class="line">        img.draw_rectangle(pos)</span><br><span class="line">        img.draw_string(pos[<span class="number">0</span>], pos[<span class="number">1</span>], <span class="string">&quot;%s : %.2f&quot;</span> % (labels[obj.classid()], obj.value()), scale=<span class="number">2</span>, color=(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>))</span><br><span class="line">    <span class="keyword">if</span> labels[obj.classid()] == <span class="string">&#x27;1&#x27;</span>:</span><br><span class="line">        <span class="keyword">if</span> count == <span class="number">0</span>:</span><br><span class="line">            uart.write(labels[obj.classid()])</span><br><span class="line">            <span class="built_in">print</span>(labels[obj.classid()])</span><br><span class="line">            count = <span class="number">1</span></span><br><span class="line">    <span class="comment"># 类似的判断和发送操作对标签 &#x27;2&#x27;，&#x27;3&#x27; 和 &#x27;4&#x27; 也进行。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果检测到物体，循环遍历每个物体，绘制物体的矩形框，并在矩形框上显示物体的标签和置信度。根据检测到的物体标签，向 UART 发送对应的标签（例如：’1’, ‘2’, ‘3’, ‘4’）。每次发送后，count 被设置为不同的值以确保只发送一次。</li>
+</ul>
+<h2 id="STM32-数据处理部分"><a href="#STM32-数据处理部分" class="headerlink" title="STM32 - 数据处理部分"></a>STM32 - 数据处理部分</h2><ul>
+<li><code>Path:</code> SYSTEM&#x2F;usart&#x2F;usart.c</li>
+<li>代码逻辑图<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">uart_init</span><br><span class="line"> ├── 初始化 GPIO</span><br><span class="line"> │    ├── GPIOA.9 (USART1_TX 配置为复用推挽输出)</span><br><span class="line"> │    └── GPIOA.10 (USART1_RX 配置为浮空输入)</span><br><span class="line"> ├── NVIC_Init</span><br><span class="line"> │    └── 设置 USART1 中断优先级并使能</span><br><span class="line"> └── USART_Init</span><br><span class="line">      ├── 设置波特率、数据位、停止位、校验位等参数</span><br><span class="line">      └── 开启 USART1 接收中断</span><br><span class="line"></span><br><span class="line">USART1_IRQHandler</span><br><span class="line"> ├── 检查 RXNE 标志位</span><br><span class="line"> ├── 接收数据并存入 RxDate</span><br><span class="line"> ├── 设置 RxFlag=1</span><br><span class="line"> └── 清除 RXNE 中断标志位</span><br><span class="line"></span><br><span class="line">Uart_dothing</span><br><span class="line"> ├── 调用 Serial_GetRxFlag 检查是否有接收数据</span><br><span class="line"> ├── 根据 Serial_GetRxDate 返回的值 (&#x27;1&#x27; ~ &#x27;4&#x27;)</span><br><span class="line"> │    ├── LED0 状态翻转</span><br><span class="line"> │    ├── 更新 OLED 显示内容</span><br><span class="line"> │    ├── 调用 setAngle 控制舵机转动</span><br><span class="line"> │    │    └── 根据具体序列 (&#x27;1&#x27;, &#x27;2&#x27;, &#x27;3&#x27;, &#x27;4&#x27;) 调用 setAngle 设置不同角度</span><br><span class="line"> │    └── 通过 USART1 发送确认数据</span><br><span class="line"> └── 如果 time_flag=1，则显示初始化状态并关闭 TIM2</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol>
+<li>串口初始化部分 (此部分可以跳过)</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">uart_init</span><span class="params">(u32 bound)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//1. 开启 GPIO 和 USART1 时钟</span></span><br><span class="line">    RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA, ENABLE);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//2. 配置 USART1 TX 引脚（GPIOA.9）</span></span><br><span class="line">    GPIO_InitTypeDef GPIO_InitStructure;</span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;               <span class="comment">// A9 引脚</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;       <span class="comment">// 高速 50MHz</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;         <span class="comment">// 复用推挽输出</span></span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3. 配置 USART1 RX 引脚（GPIOA.10）</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;              <span class="comment">// A10 引脚</span></span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;   <span class="comment">// 浮空输入模式</span></span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//4. 配置串口的基础信息</span></span><br><span class="line">    USART_InitTypeDef USART_InitStructure;</span><br><span class="line">    USART_InitStructure.USART_BaudRate = bound;             <span class="comment">// 波特率</span></span><br><span class="line">    USART_InitStructure.USART_WordLength = USART_WordLength_8b; <span class="comment">// 字长 8 位</span></span><br><span class="line">    USART_InitStructure.USART_StopBits = USART_StopBits_1;  <span class="comment">// 1 个停止位</span></span><br><span class="line">    USART_InitStructure.USART_Parity = USART_Parity_No;     <span class="comment">// 无校验位</span></span><br><span class="line">    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; <span class="comment">// 无流控</span></span><br><span class="line">    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; <span class="comment">// 允许收发模式</span></span><br><span class="line">    USART_Init(USART1, &amp;USART_InitStructure);               <span class="comment">// 初始化 USART1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//5. 配置 NVIC 中断优先级，并使能中断</span></span><br><span class="line">    NVIC_InitTypeDef NVIC_InitStructure;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = <span class="number">3</span>; <span class="comment">// 抢占优先级</span></span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelSubPriority = <span class="number">3</span>;        <span class="comment">// 子优先级</span></span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;</span><br><span class="line">    NVIC_Init(&amp;NVIC_InitStructure);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//6. 开启 USART 中断和串口</span></span><br><span class="line">    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);     <span class="comment">// 开启接收数据中断</span></span><br><span class="line">    USART_Cmd(USART1, ENABLE);                        <span class="comment">// 使能串口</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>中断服务程序 - 接收数据并设置标志位</li>
+</ol>
+<ul>
+<li>在这段函数中，程序接收引脚的数据并存储到变量，即从USART_ReceiveData获取USART1的值，存储到RxDate，将RxDate封装到Serial_GetRxDate。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">u8 <span class="title function_">Serial_GetRxDate</span><span class="params">(<span class="type">void</span>)</span><span class="comment">//封装一个函数接受</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span>	RxDate;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">USART1_IRQHandler</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (USART_GetITStatus(USART1, USART_IT_RXNE) == SET) <span class="comment">// 判断是否收到数据</span></span><br><span class="line">    &#123;</span><br><span class="line">        RxDate = USART_ReceiveData(USART1);             <span class="comment">// 接收数据存储到全局变量</span></span><br><span class="line">        state = <span class="number">1</span>;                                      <span class="comment">// 设置状态标志位</span></span><br><span class="line">        RxFlag = <span class="number">1</span>;                                     <span class="comment">// 标志数据已接收</span></span><br><span class="line">        USART_ClearITPendingBit(USART1, USART_IT_RXNE); <span class="comment">// 清除中断标志</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>主逻辑处理函数 - 根据具体接收字符执行不同操作</li>
+</ol>
+<ul>
+<li>根据Serial_GetRxFlag的值来给出相应的控制数据，我们这里以接收到数值‘1’为例，即可回收垃圾</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Uart_dothing</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (Serial_GetRxFlag() == <span class="number">1</span>) <span class="comment">// 判断是否接收到数据</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Serial_GetRxDate() == <span class="string">&#x27;1&#x27;</span>) <span class="comment">// 如果接收到字符 &#x27;1&#x27;</span></span><br><span class="line">        &#123;</span><br><span class="line">            LED0 = !LED0;                          <span class="comment">// 翻转 LED 指示灯</span></span><br><span class="line">            OLED_Clear();                          <span class="comment">// 清空 OLED 显示</span></span><br><span class="line">            OLED_ShowString(<span class="number">1</span>, <span class="number">1</span>, <span class="string">&quot;serial:&quot;</span>);      <span class="comment">// OLED 显示串口输入</span></span><br><span class="line">            OLED_ShowNum(<span class="number">1</span>, <span class="number">8</span>, <span class="number">1</span>, <span class="number">1</span>);              <span class="comment">// 数字 1</span></span><br><span class="line">            OLED_ShowString(<span class="number">2</span>, <span class="number">1</span>, <span class="string">&quot;kind:&quot;</span>);        <span class="comment">// 显示垃圾种类</span></span><br><span class="line">            OLED_ShowString(<span class="number">2</span>, <span class="number">6</span>, <span class="string">&quot;cycle&quot;</span>);        <span class="comment">// 类型：可回收</span></span><br><span class="line">            OLED_ShowString(<span class="number">3</span>, <span class="number">1</span>, <span class="string">&quot;num:&quot;</span>);         <span class="comment">// 数量</span></span><br><span class="line">            OLED_ShowNum(<span class="number">3</span>, <span class="number">5</span>, <span class="number">1</span>, <span class="number">1</span>);              <span class="comment">// 输入类别为“1”</span></span><br><span class="line">            OLED_ShowString(<span class="number">4</span>, <span class="number">1</span>, <span class="string">&quot;OK&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 控制舵机动作</span></span><br><span class="line">            setAngle(<span class="number">0</span>, <span class="number">90</span>);                       <span class="comment">// 通道 0 转动到 90 度</span></span><br><span class="line">            delay_ms(<span class="number">1000</span>);                        <span class="comment">// 延时 1 秒</span></span><br><span class="line">            setAngle(<span class="number">1</span>, <span class="number">120</span>);                      <span class="comment">// 通道 1 转动到 120 度</span></span><br><span class="line">            delay_ms(<span class="number">1000</span>);                        <span class="comment">// 延时 1 秒</span></span><br><span class="line">            setAngle(<span class="number">1</span>, <span class="number">70</span>);                       <span class="comment">// 通道 1 恢复到 70 度</span></span><br><span class="line">            delay_ms(<span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">            state = <span class="number">0</span>;                             <span class="comment">// 状态标志位清零</span></span><br><span class="line">            TIM_Cmd(TIM2, ENABLE);                 <span class="comment">// 启动定时器</span></span><br><span class="line">            USART_SendData(USART1, <span class="string">&#x27;1&#x27;</span>);           <span class="comment">// 回传字符 &#x27;1&#x27;（确认接收完成）</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (Serial_GetRxDate() == <span class="string">&#x27;2&#x27;</span>) <span class="comment">// 如果接收到字符 &#x27;2&#x27;</span></span><br><span class="line">        <span class="comment">// 继续‘2’、‘3’、‘4’的逻辑 ...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (time_flag == <span class="number">1</span>) <span class="comment">// 定时器事件</span></span><br><span class="line">    &#123;</span><br><span class="line">        time_flag = <span class="number">0</span>;                  <span class="comment">// 清除定时器标志</span></span><br><span class="line">        LED0 = !LED0;                   <span class="comment">// 翻转 LED</span></span><br><span class="line">        OLED_Clear();                   <span class="comment">// 清空 OLED</span></span><br><span class="line">        OLED_ShowString(<span class="number">1</span>, <span class="number">1</span>, <span class="string">&quot;To begin!!!&quot;</span>); <span class="comment">// 显示字符串</span></span><br><span class="line">        TIM_Cmd(TIM2, DISABLE);         <span class="comment">// 停止定时器</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>我们可以看到，当MaixBit通过窗口给STM32发送数据后，STM32根据不同的数值（垃圾类型）调用了多个舵机控制函数，并传入了多组数值，这边我们接着分析这些舵机控制函数是如何对舵机进行进一步控制的。</li>
+</ul>
+<h2 id="PCA9685-舵机实际控制部分"><a href="#PCA9685-舵机实际控制部分" class="headerlink" title="PCA9685 - 舵机实际控制部分"></a>PCA9685 - 舵机实际控制部分</h2><ul>
+<li><code>Path:</code> BSP&#x2F;bsp_PCA9685.c</li>
+<li>代码逻辑关系图：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">PCA9685_Init</span><br><span class="line"> ├── IIC_Init         (初始化 I2C 通信)</span><br><span class="line"> ├── PCA9685_Write    (初始化模式寄存器)</span><br><span class="line"> ├── PCA9685_setFreq  (设置频率)</span><br><span class="line"> └── PCA9685_setPWM   (初始化各通道 PWM 占空比)</span><br><span class="line"></span><br><span class="line">setAngle</span><br><span class="line"> ├── 将角度映射为 PWM off 值</span><br><span class="line"> └── 调用 PCA9685_setPWM 设置 PWM</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol>
+<li>什么是PCA9685，这段代码是干什么的？</li>
+</ol>
+<ul>
+<li>这段代码是用于驱动 PCA9685 的驱动程序实现，PCA9685 是一个 16 通道 PWM 控制器，经常用于舵机控制、电机驱动或 LED 调光等需要 PWM 信号的场景。代码通过I²C通信来与 PCA9685 芯片交互，可以实现以下功能：  <ul>
+<li>初始化 PCA9685，包括设置工作频率和舵机初始位置。</li>
+<li>设置 PWM 信号频率，用于生成不同的脉宽。</li>
+<li>配置指定通道的 PWM 占空比，实现控制。</li>
+<li>通过控制角度，调整舵机的旋转位置。</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>初始化 PCA9685</li>
+</ol>
+<ul>
+<li>这个函数用于初始化 PCA9685 驱动板，设置 PWM 工作频率和舵机的初始角度</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">PCA9685_Init</span><span class="params">(<span class="type">float</span> hz, u8 angle)</span></span><br><span class="line">&#123;</span><br><span class="line">    u32 off = <span class="number">0</span>;    <span class="comment">// 默认占空比为 0</span></span><br><span class="line">    IIC_Init();     <span class="comment">// 初始化 I²C 通信</span></span><br><span class="line">    PCA9685_Write(PCA_Model, <span class="number">0x00</span>);  <span class="comment">// 清除 MODE 寄存器，准备设置</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置 PWM 频率（通常与舵机工作频率匹配）</span></span><br><span class="line">    PCA9685_setFreq(hz);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 根据输入角度计算脉宽值，并初始化 16 个通道</span></span><br><span class="line">    off = (u32)(<span class="number">145</span> + angle * <span class="number">2.4</span>); </span><br><span class="line">    PCA9685_setPWM(<span class="number">0</span>, <span class="number">0</span>, off);</span><br><span class="line">    PCA9685_setPWM(<span class="number">1</span>, <span class="number">0</span>, off);</span><br><span class="line">    PCA9685_setPWM(<span class="number">2</span>, <span class="number">0</span>, off);</span><br><span class="line">    ...</span><br><span class="line">    PCA9685_setPWM(<span class="number">15</span>, <span class="number">0</span>, off);    <span class="comment">// 全部通道设置初始占空比（舵机默认位置）</span></span><br><span class="line">    </span><br><span class="line">    delay_ms(<span class="number">100</span>);  <span class="comment">// 延时 100 毫秒</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>这段函数可能涉及到了多个机械自动化专业的名词，这里我们可以不去深究，简单的解释它们的关系和用途：</p>
+<ul>
+<li><strong>占空比&#x2F;脉宽值:</strong> 决定舵机角度。</li>
+<li><strong>通道:</strong> 指定控制哪个舵机。</li>
+<li><strong>寄存器:</strong> 通过配置寄存器设置每个通道的 PWM 信号参数（频率和脉宽）。</li>
+</ul>
+</li>
+<li><p>更加专业的解释就不再说明了，本人也非机械专业学生，知识有限，只知道这些对于这个项目就足够了，感兴趣的话可以Google一下。</p>
+</li>
+</ul>
+<ol start="3">
+<li>初始化模式寄存器</li>
+</ol>
+<ul>
+<li>向 PCA9685 的寄存器写入或者读取一个字节的数据，通过 IIC 函数完成数据的发送与接收，<strong>此处不设计舵机具体控制，可以跳过</strong>；</li>
+<li>写入函数参数含义：<ul>
+<li>addr: 目标寄存器地址。</li>
+<li>data: 要写入的数据。</li>
+</ul>
+</li>
+<li>写入函数流程：<ul>
+<li>发送器件地址 PCA_Addr。</li>
+<li>发送寄存器地址 addr。</li>
+<li>发送数据 data。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">PCA9685_Write</span><span class="params">(u8 addr,u8 data)</span>   <span class="comment">//向PCA写数据，adrrd地址，data数据</span></span><br><span class="line">&#123;</span><br><span class="line">	IIC_Start();</span><br><span class="line">	</span><br><span class="line">	IIC_Send_Byte(PCA_Addr);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	</span><br><span class="line">	IIC_Send_Byte(addr);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	</span><br><span class="line">	IIC_Send_Byte(data);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	</span><br><span class="line">	IIC_Stop();	</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">u8 <span class="title function_">PCA9685_Read</span><span class="params">(u8 addr)</span>   <span class="comment">//从PCA读数据</span></span><br><span class="line">&#123;</span><br><span class="line">	u8 data;</span><br><span class="line">	</span><br><span class="line">	IIC_Start();</span><br><span class="line">	IIC_Send_Byte(PCA_Addr);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	IIC_Send_Byte(addr);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	IIC_Stop();</span><br><span class="line">	</span><br><span class="line">	delay_us(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">	IIC_Start();</span><br><span class="line">	IIC_Send_Byte(PCA_Addr|<span class="number">0x01</span>);</span><br><span class="line">	IIC_NAck();</span><br><span class="line">	data = IIC_Read_Byte(<span class="number">0</span>);</span><br><span class="line">	IIC_Stop();</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>设置Freq与PWM</li>
+</ol>
+<ul>
+<li>此部分为PCA9685对舵机的内部底层控制的接口，并非程序的外部接口，所以跳过此部分解析。</li>
+</ul>
+<ol start="5">
+<li>舵机转动角度控制部分</li>
+</ol>
+<ul>
+<li>这部分是整个PCA9685最重要的控制部分，先来看代码，很简单，将角度转化为PCA9685可以接受的PWM数值：</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">setAngle</span><span class="params">(u8 num, u8 angle)</span></span><br><span class="line">&#123;</span><br><span class="line">    u32 off = <span class="number">0</span>;</span><br><span class="line">    off = (u32)(<span class="number">158</span> + angle * <span class="number">2.2</span>);  <span class="comment">// 根据角度计算对应的 PWM 高电平结束位置</span></span><br><span class="line">    PCA9685_setPWM(num, <span class="number">0</span>, off);    <span class="comment">// 调用函数设置 PWM 信号</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>输入参数<ul>
+<li><strong>num</strong>：PCA9685 输出通道号（范围 0-15），对应驱动的舵机编号，结合项目实际，num&#x3D;0为水平方向的舵机，num&#x3D;1为竖直方向的舵机。</li>
+<li><strong>angle</strong>：目标角度，单位是度（例如 0°, 90°, 180°），需要通过公式转换为 PWM 脉宽值。</li>
+</ul>
+</li>
+<li>PWM 脉宽计算公式计算逻辑 (推广)<ul>
+<li><strong>158</strong>：对应舵机的最小脉宽（约 1ms）。</li>
+<li><strong>angle * 2.2</strong>：将角度线性映射到 PWM 的增加值。</li>
+<li>例如：<ul>
+<li>角度为 0° 时，off &#x3D; 158。</li>
+<li>角度为 90° 时，off ≈ 158 + 90 * 2.2 ≈ 356。</li>
+<li>角度为 180° 时，off ≈ 158 + 180 * 2.2 ≈ 554。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="流程总结与示例"><a href="#流程总结与示例" class="headerlink" title="流程总结与示例"></a>流程总结与示例</h2><p><strong>MaixBit部分：</strong><br>开始 –&gt; 识别到可回收垃圾 –&gt; 通过UART窗口发送‘1’</p>
+<p><strong>STM32部分：</strong><br>–&gt; 接收数据‘1’，存储到<code>RxDate</code>，方便<code>Serial_GetRxFlag</code>调用 –&gt; 通过判断<code>Serial_GetRxFlag</code>值为‘1’（可回收垃圾）  –&gt; 更新屏幕显示，调用<code>setAngle</code>控制舵机转动</p>
+<p><strong>PCA9685部分：</strong><br>–&gt; 接收<code>setAngle</code>参数，控制舵机进行水平和竖直转动 –&gt; 结束</p>
+<h2 id="STM32上的垃圾桶满载检测部分"><a href="#STM32上的垃圾桶满载检测部分" class="headerlink" title="STM32上的垃圾桶满载检测部分"></a>STM32上的垃圾桶满载检测部分</h2><ol>
+<li>先来看具体的代码实现<br><code>Path:</code> HARDWARE&#x2F;threshold.c</li>
+</ol>
+<ul>
+<li><strong>Threshold_Init 函数：</strong> 函数的目的是配置GPIOA的引脚4，也就是A04引脚，为垃圾满载检测的传感器；<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Threshold_Init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line"> GPIO_InitTypeDef  GPIO_InitStructure;</span><br><span class="line"> 	</span><br><span class="line"> RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	 <span class="comment">//使能PC 端口时钟</span></span><br><span class="line">	</span><br><span class="line"> GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;				 <span class="comment">//LED0端口配置</span></span><br><span class="line"> GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD; 		 <span class="comment">//推挽输出</span></span><br><span class="line"> GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 <span class="comment">//IO口速度为50MHz</span></span><br><span class="line"> GPIO_Init(GPIOA, &amp;GPIO_InitStructure);					 <span class="comment">//根据设定参数初始化</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><strong>Threshold_control 函数</strong><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Threshold_control</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(state==<span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(PAin(<span class="number">4</span>)==<span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//OLED_Clear();</span></span><br><span class="line">			OLED_ShowString(<span class="number">1</span>,<span class="number">1</span>,<span class="string">&quot;harmful      &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">2</span>,<span class="number">1</span>,<span class="string">&quot;fully loaded &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">3</span>,<span class="number">1</span>,<span class="string">&quot;             &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">4</span>,<span class="number">1</span>,<span class="string">&quot;             &quot;</span>);</span><br><span class="line">			PBout(<span class="number">11</span>)=<span class="number">0</span>;</span><br><span class="line">			delay_ms(<span class="number">500</span>);</span><br><span class="line">			PBout(<span class="number">11</span>)=<span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">		&#123;</span><br><span class="line">			OLED_ShowString(<span class="number">1</span>,<span class="number">1</span>,<span class="string">&quot;To begin!!!  &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">2</span>,<span class="number">1</span>,<span class="string">&quot;             &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">3</span>,<span class="number">1</span>,<span class="string">&quot;             &quot;</span>);</span><br><span class="line">			OLED_ShowString(<span class="number">4</span>,<span class="number">1</span>,<span class="string">&quot;             &quot;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>整体逻辑：<ul>
+<li>如果系统状态变量 state 为 0：<ul>
+<li>检查 GPIOA 引脚 4 的电平。<ul>
+<li>如果是低电平：<ul>
+<li>在 OLED 显示屏上显示特定的警告信息，例如 “harmful” 和 “fully loaded”。</li>
+<li>控制 GPIOB 引脚 11：先设置为低电平（激活某设备或触发某动作），延时 500 毫秒后恢复为高电平。</li>
+</ul>
+</li>
+<li>如果不是低电平：<ul>
+<li>显示提示信息 “To begin!!!”，表示准备开始。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>现在我们知道触发检测垃圾是否满载的条件了，即系统变量<code>state</code>的值，这个值是怎么变化的？我们来分析涉及到的<code>usart.c</code>，即我们前面分析的STM32接收信息与处理部分的代码，我们直接来分析关键部分，代码如下：</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">······</span><br><span class="line">u8 state=<span class="number">0</span>;                                         <span class="comment">// 此处定义了state的初始值</span></span><br><span class="line">······</span><br><span class="line"><span class="keyword">if</span> (USART_GetITStatus(USART1, USART_IT_RXNE) == SET)</span><br><span class="line">&#123;</span><br><span class="line">    RxDate = USART_ReceiveData(USART1);             <span class="comment">// 读取接收到的数据</span></span><br><span class="line">    state = <span class="number">1</span>;                                      <span class="comment">// 设置 state 为 1</span></span><br><span class="line">    RxFlag = <span class="number">1</span>;                                     <span class="comment">// 设置接收完成标志为 1</span></span><br><span class="line">    USART_ClearITPendingBit(USART1, USART_IT_RXNE); <span class="comment">// 清除中断标志</span></span><br><span class="line">&#125;</span><br><span class="line">······</span><br><span class="line"><span class="type">void</span> <span class="title function_">Uart_dothing</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(Serial_GetRxFlag()==<span class="number">1</span>)                       <span class="comment">// 如果接收完成标志为 1</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">if</span>(Serial_GetRxDate()==<span class="string">&#x27;1&#x27;</span>)             <span class="comment">// 如果垃圾类型为 1</span></span><br><span class="line">			&#123; </span><br><span class="line">                ······</span><br><span class="line">				setAngle(<span class="number">1</span>,<span class="number">70</span>);                     <span class="comment">// 对应舵机的一系列控制</span></span><br><span class="line">                ······</span><br><span class="line">				state=<span class="number">0</span>;                            <span class="comment">// 完成舵机操作后，重新设置 state为 0</span></span><br><span class="line">				TIM_Cmd(TIM2, ENABLE);</span><br><span class="line">				USART_SendData(USART1,<span class="string">&#x27;1&#x27;</span>);	        <span class="comment">// 串口返回数据 1</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> <span class="keyword">if</span>(Serial_GetRxDate()==<span class="string">&#x27;2&#x27;</span>)        <span class="comment">// 其他垃圾种类逻辑一致</span></span><br><span class="line">            ······</span><br><span class="line">		&#125;</span><br><span class="line">        ······</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>综上，state 是一个全局变量，初始值为 0，用于标识串口通信的状态或控制不同的逻辑流程。当STM32串口收到数据时，state 被设置为 1,当处理完接收到的数据后，state 被重新设置为 0。</li>
+<li>在实际使用中的逻辑就是，开机后会自动开始检测是否满载，如果识别到垃圾，停止检测，处理垃圾，然后处理完后，继续保持检测是否满载状态。</li>
+</ol>
+
+                    
+                </div>
+
+                
+                        
+<div class="post-copyright-info-container border-box">
+    <div class="copyright-info-content border-box">
+        <div class="copyright-info-top border-box">
+            <div class="copyright-post-title border-box text-ellipsis">
+                MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析
+            </div>
+
+            <div class="copyright-post-link border-box text-ellipsis">
+                2024/11/24/Two-way-servo-garbage-sorting-project/
+            </div>
+        </div>
+
+        <div class="copyright-info-bottom border-box">
+            <div class="copyright-post-author bottom-item">
+                <div class="type">
+                    作者
+                </div>
+                <div class="content">SaKongA</div>
+            </div>
+
+            <div class="post-time bottom-item">
+                <div class="type">
+                    发布于
+                </div>
+                <div class="content">2024-11-24 17:48</div>
+            </div>
+
+
+            <div class="post-license bottom-item">
+                <div class="type">
+                    许可
+                </div>
+                <div class="content tooltip" data-tooltip-content="CC BY-NC-SA 4.0">
+                    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans" target="_blank">
+                        
+                            <i class="fa-brands fa-creative-commons"></i>
+                            <i class="fa-brands fa-creative-commons-by"></i>
+                            <i class="fa-brands fa-creative-commons-nc"></i>
+                            <i class="fa-brands fa-creative-commons-sa"></i>
+                        
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <i class="copyright-bg fa-solid fa-copyright"></i>
+    </div>
+    <div class="copy-copyright-info flex-center tooltip" data-tooltip-content="复制版权信息" data-tooltip-offset-y="-2px">
+        <i class="fa-solid fa-copy"></i>
+    </div>
+</div>
+
+                
+
+                <div class="post-bottom-tags-and-share border-box">
+                    <div>
+                        
+                    </div>
+                    <div>
+                        
+                            <div class="post-share-container border-box">
+    <ul class="share-list-wrap border-box">
+        <li class="qq share-item border-box flex-center tooltip"
+            data-tooltip-content="分享到 QQ"
+        >
+            <i class="fa-brands fa-qq"></i>
+        </li>
+        <li class="wechat share-item border-box flex-center tooltip tooltip-img"
+            data-tooltip-content="分享到微信"
+            data-tooltip-img-tip="微信扫一扫"
+            data-tooltip-img-style="background-color: #fff; top: -10px; padding: 0.6rem 0.6rem 0.1rem 0.6rem;"
+        >
+            <i class="fa-brands fa-weixin"></i>
+        </li>
+        <li class="weibo share-item border-box flex-center tooltip"
+            data-tooltip-content="分享到微博"
+        >
+            <i class="fa-brands fa-weibo"></i>
+        </li>
+    </ul>
+</div>
+
+                        
+                    </div>
+                </div>
+
+                
+
+                
+                    <div class="post-nav border-box">
+                        
+                            <div class="prev-post">
+                                <a class="prev"
+                                   rel="prev"
+                                   href="/2025/02/19/Quick-Start-ToF-Laser-Distance-Sensor-VL6180/"
+                                   title="快速入门在STM32标准库上的ToF激光测距传感器 - VL6180"
+                                >
+                                    <span class="left arrow-icon flex-center">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </span>
+                                    <span class="title flex-center">
+                                        <span class="post-nav-title-item text-ellipsis">快速入门在STM32标准库上的ToF激光测距传感器 - VL6180</span>
+                                        <span class="post-nav-item">上一篇</span>
+                                    </span>
+                                </a>
+                            </div>
+                        
+                        
+                            <div class="next-post">
+                                <a class="next"
+                                   rel="next"
+                                   href="/2024/09/17/A-reverse-journey-of-Huawei-Bluetooth-headset-SPP-communication/"
+                                   title="一次华为蓝牙耳机SPP通讯的逆向之旅"
+                                >
+                                    <span class="title flex-center">
+                                        <span class="post-nav-title-item text-ellipsis">一次华为蓝牙耳机SPP通讯的逆向之旅</span>
+                                        <span class="post-nav-item">下一篇</span>
+                                    </span>
+                                    <span class="right arrow-icon flex-center">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            </div>
+                        
+                    </div>
+                
+
+                
+                    
+
+
+
+
+
+
+                
+            </div>
+        </div>
+
+        
+            <div class="pc-post-toc right-toc">
+                <div class="post-toc-wrap border-box">
+    <div class="post-toc border-box">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MaixBit-%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%E5%A4%84%E7%90%86%E9%83%A8%E5%88%86"><span class="nav-text">MaixBit - 图像识别处理部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#STM32-%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E9%83%A8%E5%88%86"><span class="nav-text">STM32 - 数据处理部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCA9685-%E8%88%B5%E6%9C%BA%E5%AE%9E%E9%99%85%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86"><span class="nav-text">PCA9685 - 舵机实际控制部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93%E4%B8%8E%E7%A4%BA%E4%BE%8B"><span class="nav-text">流程总结与示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#STM32%E4%B8%8A%E7%9A%84%E5%9E%83%E5%9C%BE%E6%A1%B6%E6%BB%A1%E8%BD%BD%E6%A3%80%E6%B5%8B%E9%83%A8%E5%88%86"><span class="nav-text">STM32上的垃圾桶满载检测部分</span></a></li></ol>
+    </div>
+</div>
+
+            </div>
+        
+    </div>
+</div>
+
+
+                
+            </div>
+        </div>
+
+        <div class="page-main-content-bottom border-box">
+            
+<footer class="footer border-box">
+    <div class="copyright-info info-item">
+    &copy;&nbsp;<span>2023</span>&nbsp;-&nbsp;2025
+    
+            &nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;&nbsp;<a href="/">SaKongA</a>
+        
+    </div>
+
+    <div class="theme-info info-item">
+        由&nbsp;<a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;驱动&nbsp;&&nbsp;主题&nbsp;<a class="keep-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep</a>
+    </div>
+
+    
+
+    
+        <div class="count-info info-item">
+            
+
+            
+                <span class="count-item border-box uv">
+                    <span class="item-type border-box">访客数</span>
+                    <span class="item-value border-box uv" id="busuanzi_value_site_uv"></span>
+                </span>
+            
+
+            
+                <span class="count-item border-box pv">
+                    <span class="item-type border-box">访问量</span>
+                    <span class="item-value border-box pv" id="busuanzi_value_site_pv"></span>
+                </span>
+            
+        </div>
+    
+
+    
+</footer>
+
+        </div>
+    </div>
+
+    <!-- post tools -->
+    
+        <div class="post-tools right-toc">
+            <div class="post-tools-container border-box">
+    <ul class="post-tools-list border-box">
+        <!-- PC encrypt again -->
+        
+
+        <!-- PC TOC show toggle -->
+        
+            <li class="tools-item flex-center toggle-show-toc">
+                <i class="fas fa-list"></i>
+            </li>
+        
+
+        <!-- PC go comment -->
+        
+
+        <!-- PC full screen -->
+        <li class="tools-item flex-center full-screen">
+            <i class="fa-solid fa-expand"></i>
+        </li>
+    </ul>
+</div>
+
+        </div>
+    
+
+    <!-- side tools -->
+    <div class="side-tools">
+        <div class="side-tools-container border-box ">
+    <ul class="side-tools-list side-tools-show-handle border-box">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <!-- toggle mode -->
+        
+            <li class="tools-item tool-toggle-theme-mode flex-center">
+                <i class="fas fa-moon"></i>
+            </li>
+        
+
+        <!-- rss -->
+        
+
+        <!-- to bottom -->
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list border-box">
+        
+            <li class="tools-item toggle-show-toc-tablet flex-center">
+                <i class="fas fa-list"></i>
+            </li>
+        
+
+        
+
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+
+        <li class="tools-item tool-scroll-to-top flex-center show-arrow">
+            <i class="arrow fas fa-arrow-up"></i>
+            <span class="percent"></span>
+        </li>
+    </ul>
+</div>
+
+    </div>
+
+    <!-- image mask -->
+    <div class="zoom-in-image-mask">
+    <img class="zoom-in-image">
+</div>
+
+
+    <!-- local search -->
+    
+        <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-input-field-pre">
+            <i class="fas fa-keyboard"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="搜索..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="close-popup-btn">
+                <i class="fas fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fas fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+    <!-- tablet toc -->
+    
+        <div class="tablet-post-toc-mask">
+            <div class="tablet-post-toc">
+                <div class="post-toc-wrap border-box">
+    <div class="post-toc border-box">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MaixBit-%E5%9B%BE%E5%83%8F%E8%AF%86%E5%88%AB%E5%A4%84%E7%90%86%E9%83%A8%E5%88%86"><span class="nav-text">MaixBit - 图像识别处理部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#STM32-%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E9%83%A8%E5%88%86"><span class="nav-text">STM32 - 数据处理部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PCA9685-%E8%88%B5%E6%9C%BA%E5%AE%9E%E9%99%85%E6%8E%A7%E5%88%B6%E9%83%A8%E5%88%86"><span class="nav-text">PCA9685 - 舵机实际控制部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93%E4%B8%8E%E7%A4%BA%E4%BE%8B"><span class="nav-text">流程总结与示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#STM32%E4%B8%8A%E7%9A%84%E5%9E%83%E5%9C%BE%E6%A1%B6%E6%BB%A1%E8%BD%BD%E6%A3%80%E6%B5%8B%E9%83%A8%E5%88%86"><span class="nav-text">STM32上的垃圾桶满载检测部分</span></a></li></ol>
+    </div>
+</div>
+
+            </div>
+        </div>
+    
+</main>
+
+
+
+
+
+<!-- common js -->
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/toggle-theme.js"></script>
+
+<script src="/js/code-block.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+
+<!-- local search -->
+
+    
+<script src="/js/local-search.js"></script>
+
+
+
+<!-- lazyload -->
+
+    
+<script src="/js/lazyload.js"></script>
+
+
+
+<div class="pjax">
+    <!-- home page -->
+    
+
+    <!-- post page -->
+    
+        <!-- post-helper -->
+        
+<script src="/js/post/post-helper.js"></script>
+
+
+        <!-- toc -->
+        
+            
+<script src="/js/post/toc.js"></script>
+
+        
+
+        <!-- copyright-info -->
+        
+            
+<script src="/js/post/copyright-info.js"></script>
+
+        
+
+        <!-- share -->
+        
+            
+<script src="/js/post/share.js"></script>
+
+        
+    
+
+    <!-- categories page -->
+    
+
+    <!-- links page -->
+    
+
+    <!-- photos page -->
+    
+
+    <!-- tools page -->
+    
+</div>
+
+<!-- mermaid -->
+
+
+<!-- pjax -->
+
+    
+<script src="/js/libs/pjax.min.js"></script>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        window.pjax = new Pjax({
+            selectors: [
+                'head title',
+                '.page-container',
+                '.pjax'
+            ],
+            history: true,
+            debug: false,
+            cacheBust: false,
+            timeout: 0,
+            analytics: false,
+            currentUrlFullReload: false,
+            scrollRestoration: false,
+        });
+
+        document.addEventListener('pjax:send', () => {
+            KEEP.utils.pjaxProgressBarStart()
+        });
+
+        document.addEventListener('pjax:complete', () => {
+            KEEP.utils.pjaxProgressBarEnd()
+            window.pjax.executeScripts(document.querySelectorAll('script[data-pjax], .pjax script'))
+            KEEP.initExecute()
+        });
+    });
+</script>
+
+
+
+
+    
+        
+    
+
+</body>
+</html>

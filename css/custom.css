@@ -1,0 +1,55 @@
+/* your-hexo/source/css/custom.css */
+
+:root {
+    --base-font-size: 16px;
+    --base-font-family: Consolas;
+}
+
+.dark-mode {
+    --background-color-1: #252526;
+    --content-background-color: #1e1e1e;
+    --highlight-background: #1e1e1e;
+    --highlight-gutter-bg-color: #1e1e1e;
+    --highlight-comment: #57a64a;
+    --highlight-orange: #4ec9b0;
+    --highlight-green: #b8d7a3;
+    --highlight-aqua: #dcdcdc;
+    --highlight-blue: #1f4a6d;
+    --highlight-purple: #5396ce;
+    --text-color-3: #d4d4d4;
+}
+
+.highlight .code pre {
+    background-color: #161616;
+}
+
+.highlight .line {
+    color: #d4d4d4;
+}
+
+pre .comment {
+    color: var(--highlight-comment);
+    font-style: italic;
+    font-family: "Cascadia Code", "Fira Code", Consolas, "Courier New", monospace;
+    font-variant-ligatures: contextual; /* 启用连字，模仿 VS Code */
+}
+
+.light-mode {
+    --highlight-comment: #57a64a;
+    --highlight-orange: #4ec9b0;
+    --highlight-green: #b8d7a3;
+    --highlight-aqua: #dcdcdc;
+    --highlight-blue: #1f4a6d;
+    --highlight-purple: #5396ce;
+    --highlight-gutter-color: #585865;
+    --highlight-gutter-bg-color: #1e1e1e;
+    --highlight-background: #1e1e1e;
+    --mac-toolbar-background-color: #323233;
+    --shrink-line-foreground: #6c8397;
+    --shrink-line-background-1: rgba(38,38,38,0.9);
+    --shrink-line-background-2: rgba(52,52,52,0.6);
+}
+
+.highlight .code pre {
+    background-color: #1e1e1e;
+}
