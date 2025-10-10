@@ -1,5 +1,10 @@
 - title: 阿空的工具箱
 
+- name: Classes2Ics
+  link: https://blog.lostzone.cn/Classes2Ics/index.html
+  description: 快速将课程表转为ICS格式
+  avatar: https://github.com/SaKongA/picx-images-hosting/raw/master/classes.73uc0bc0bq.webp
+
 - name: Json+Js Formatter
   link: https://blog.lostzone.cn/codeBeautify/index.html
   description: 简单的Json/JavaScript格式化工具
