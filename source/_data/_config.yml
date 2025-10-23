@@ -38,7 +38,8 @@ menu:
   archives: /archives || fa-solid fa-box-archive      # 归档
 #  tags: /tags || fa-solid fa-tags                     # 标签
 #  categories: /categories || fa-solid fa-layer-group  # 分类
-  tools: /tools || fa-solid fa-link                   # 链接
+  工具: /tools || fa-solid fa-wrench                   # 工具
+  友链: /friends || fa-solid fa-user-group           # 工具
   about: /about || fa-solid fa-user-graduate          # 关于
 #  photos: /photos || fa-solid fa-image                # 相册
 
