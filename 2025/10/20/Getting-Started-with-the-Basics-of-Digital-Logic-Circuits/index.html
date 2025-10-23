@@ -9,7 +9,7 @@
     
     <title>
         
-            简记在Chromium内核浏览器上编辑网络请求 |
+            入坑数字逻辑电路基础心得 |
         
         LostZone
     </title>
@@ -276,7 +276,7 @@
             <div class="post-content-bottom border-box">
                 
                     <div class="post-title">
-                        简记在Chromium内核浏览器上编辑网络请求
+                        入坑数字逻辑电路基础心得
                     </div>
                 
 
@@ -304,19 +304,28 @@
         
             <span class="meta-info-item post-create-date">
                 <i class="icon fa-solid fa-calendar-plus"></i>&nbsp;
-                <span class="datetime">2024-09-17 19:55:13</span>
+                <span class="datetime">2025-10-20 20:49:23</span>
             </span>
 
             
                 <span class="meta-info-item post-update-date">
                     <i class="icon fa-solid fa-file-pen"></i>&nbsp;
-                    <span class="datetime" data-updated="Tue Sep 17 2024 19:55:13 GMT+0800">2024-09-17 19:55:13</span>
+                    <span class="datetime" data-updated="Thu Oct 23 2025 17:00:01 GMT+0800">2025-10-23 17:00:01</span>
                 </span>
             
         
 
         
 
+        
+            <span class="post-tag meta-info-item border-box">
+                <ul class="post-tag-ul">
+                    
+                            <li class="tag-item"><span class="tag-separator"><i class="icon fas fa-hashtag"></i></span><a href="/tags/EE/">EE</a></li>
+                        
+                    
+                </ul>
+            </span>
         
 
         
@@ -341,26 +350,344 @@
                     
 
                     
-                         <h2 id="Before-This"><a href="#Before-This" class="headerlink" title="Before This:"></a>Before This:</h2><p>最近在研究UniApp相关的简单开发，由于不太喜欢去看完整且漫长的开发教程，相比之下，喜欢拿例子来举一反三，正好UniApp有自己的DCloud插件市场，提供了众多的还算不错的UniApp页面模板等资源，所以从这里面下载资源的次数还是比较多的的。后面用了一段时间之后，发现部分插件资源需要赞赏&#x2F;观看广告后，才能下载使用，由于是学习时期，暂时没有太多的预算在这个部分（其实还是我比较穷），所以果断选择广告观看下载，然后就出现了各种报错，导致无法正常观看广告下载，于是就有了绕过观看广告的想法。</p>
-<h2 id="1-熟悉"><a href="#1-熟悉" class="headerlink" title="1. 熟悉"></a>1. 熟悉</h2><p>我们点击下载插件后，会弹出需要观看广告的提示，然后需要进行扫描二维码，等待手机端完成观看后，点击“我已看完并关闭广告”，会开始进行下载。</p>
-<h2 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h2><p>根据这个流程分析，页面需要知道我们是否看完了广告？这个行为的实现，可以通过WebSocket与服务器建立连接，等待服务器的响应，也可以是通过JS来不断发送HttpRequest到服务器，来获取我们是否完成广告的观看，而我们的一个思路就是劫持服务器返回的响应数据，然后进行分析修改。<br>这边我们保持在需要进行扫描二维码的页面，按下F12打开开发者工具，切换到网络栏后，发现JS脚本在不停的发送XHR格式的HttpRequest，而Request的名称为“watch-done-plugin-ad”，即广告播放完成，查看其响应如下:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;ret&quot;</span><span class="punctuation">:</span> <span class="number">1001</span><span class="punctuation">,</span> <span class="comment">//这是一个状态码，表示发生了错误，通常状态码1000及以上表示请求失败或有错误发生。</span></span><br><span class="line">    <span class="attr">&quot;desc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;\u60a8\u5c1a\u672a\u5b8c\u6210\u89c2\u770b\u63d2\u4ef6\u5e7f\u544a\uff0c\u8bf7\u5148\u4f7f\u7528\u624b\u673a\u5fae\u4fe1\u626b\u7801\u6253\u5f00\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5e76\u89c2\u770b\u5e7f\u544a&quot;</span> <span class="comment">// 这个字段是返回的描述信息，使用了Unicode编码，解码后为：“您尚未完成观看插件广告，请先使用手机微信扫码打开微信小程序并观看广告”。</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
-<p>一般情况下，ret字段表示请求的状态或结果代码。对于成功的请求，常见的ret值通常是以下两种：</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ret<span class="punctuation">:</span> <span class="number">0</span>：表示请求成功，没有错误发生。</span><br><span class="line">ret<span class="punctuation">:</span> <span class="number">200</span>：在某些系统中，也会使用<span class="number">200</span>来表示成功，类似于HTTP状态码的<span class="number">200</span> OK。</span><br></pre></td></tr></table></figure>
-
-<p>通常，ret值为0或200是最常见的成功标志。</p>
-<p>现在我们就来着手修改这个返回的数据，由于Chromium中无法直接修改响应数据，所以我们这边只能通过直接修改JS中的request字段或者通过第三方扩展插件来实现，我这边推荐我正在用的扩展插件：<a class="link"   target="_blank" rel="noopener" href="https://chromewebstore.google.com/detail/ajax-interceptor-tools/kphegobalneikdjnboeiheiklpbbhncm" >Ajax Interceptor Tools<i class="fas fa-external-link-alt"></i></a></p>
-<h2 id="3-修改响应值"><a href="#3-修改响应值" class="headerlink" title="3. 修改响应值"></a>3. 修改响应值</h2><p>安装扩展后，在扩展中添加一个新组，新组中默认会添加一个规则，这边我们编辑规则，方法选择POST，后面“matching interface”中填入POST请求中URL的Path部分，如我的请求URL为</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://ext.dcloud.net.cn/plugin/watch-done-plugin-ad</span><br></pre></td></tr></table></figure>
-<p>那Path部分为<code>/plugin/watch-done-plugin-ad</code>,最后就是修改整个响应部分，我们从浏览器开发工具中复制整个响应部分，然后进行修改。修改示例如下：<br><img  
+                         <h2 id="Before-This"><a href="#Before-This" class="headerlink" title="Before This"></a>Before This</h2><p>或许是这个故事的起点？</p>
+<h2 id="我理解的数字电路与模拟电路？"><a href="#我理解的数字电路与模拟电路？" class="headerlink" title="我理解的数字电路与模拟电路？"></a>我理解的数字电路与模拟电路？</h2><p>对于数字电路，最简单的解释就是用电路中的电压、电流等物理量来表示0和1两种状态，没错，通常就只是这两种状态。非要用不严谨的描述来说的话，数字电路就是用高电压和低电压两种状态来表示0和1。有了0与1这两个数字之后，我们就有了二进制计数法，有了二进制，我们就可以表示任意大的数量了；<br>那模拟电路呢？我们知道，在电路里面电压、电流等物理量不是只有高低、通断两种状态，还有具体的大小变化，他们都是连续的，模拟电路就是用这种连续的量来表示具体的数据。<br>举个栗子，0V与5V，如果我们只关注这两个值，我们可以说是一个高电压，一个低电压，从而有了数字电路的概念。但是如果我们关注整体，想一下从0V变化到5V，它是一个连续的过程，比如0.1V,1V,2V….4.8V，5V，在这个过程中，我们所得到的信息是连续不断的，而不是像数字电路一样只关注起始的0V和5V，这就是模拟电路的意思。<br><img  
                        lazyload
                        alt="image"
-                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/Ajax-Interceptor-Tool%E4%BF%AE%E6%94%B9%E7%A4%BA%E4%BE%8B.5j45mi7gk6.webp"
-                        alt="Example"
-                 ><br>在这个例子中，主要修改<code>ret</code>结果代码，我们分别尝试0和200，然后重新操作下载，幸运的是，修改为0的时候，就已经可以正常下载了。</p>
-<h2 id="Final"><a href="#Final" class="headerlink" title="Final:"></a>Final:</h2><ul>
-<li>一些反思<br>在这个例子中，想要实现免广告下载的途径其实还有很多，比如，在网站中，有一部分资源是不用观看广告的，我们在请求下载时，网站会检测这个资源的下载条件，是观看广告还是需要付费，所以我们其实还可以通过修改这部分来实现我们的目的。总之，这个例子其实还是很简单的，也是想帮助遇到这个问题的朋友，通过这个方法，来临时救急一下。希望DCloud官方及时修复一下吧，DCloud鸡肋的地方还是蛮多的，最简单的例子就是把Android SDK放到垃圾网盘当中，不知道是图什么。。</li>
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF.175sbsthpj.webp"
+                        alt="Image"
+                 ><br>说这么多有什么用呢？很简单，数字电路是表示数的，所以可以做运算芯片，算数；模拟电路可以表示一个过程中连续不断的量，所以可以做传感器芯片，用电流、电压表示物理量，比如压力传感器芯片中，压力的越用力，电压越高，得出来压力也越大，这个过程是可以画成一条连续的曲线的。  </p>
+<h2 id="用MOS管表示0和1"><a href="#用MOS管表示0和1" class="headerlink" title="用MOS管表示0和1"></a>用MOS管表示0和1</h2><p>既然我们要做数字电路，那就找一个能改变电路两种状态的东西，最简单的，开关！没错，本质就是用开关控制电路通断，实现两种状态，来表示0和1。但是在芯片里面，开关那可太大了，而且也没法用手去开启关闭。于是大佬发明了一个新东西：晶体管。<br>这东西其没啥高级的，就是一个不用手，而是用电控制的开关。全称是：金属-氧化物-半导体场效应晶体管 (Metal-Oxide-Semiconductor Field-Effect Transistor, MOSFET), 简称MOS管。<br>如何使用它？很简单，MOS管有三个接口，或者说三个脚，即栅极（Gate），源极（Source），漏极（Drain）。我们可以这样去理解，栅极就是开关的按钮，就好比栅栏，能打开关闭；源极，顾名思义就是源头，可以理解为是电流的源头；漏极，就是漏出去的地方，电流出去的地方。<br>因此，我们要做的就是控制栅极，然后实现源极的电流能不能进入到漏极。<br>问题来了，我们如何去操作这个栅极？对于按下式的开关，我们按下，和松手就是连接和断开，那MOS管呢？很好，我们这里就可以把MOS管分为两个大类了：p型MOS管和n型MOS管，即pMOS与nMOS，控制方式如下：  </p>
+<ul>
+<li>对于 nMOS 来说：</li>
+<li><ul>
+<li>栅极 和 源极 的 电压差 过 “大” （Vg-Vs 较大）的时候，导通，即源极接通到漏极；</li>
 </ul>
+</li>
+<li><ul>
+<li>栅极 和 源极 的 电压差 过 “小” （Vg-Vs 较小）的时候，断开，即源极与漏极断开；</li>
+</ul>
+</li>
+<li>对于 pMOS 来说：</li>
+<li><ul>
+<li>源极 和 栅极 的 电压差 过 “大” （Vs-Vg 较大）的时候，导通，即源极接通到漏极；</li>
+</ul>
+</li>
+<li><ul>
+<li>源极 和 栅极 的 电压差 过 “小” （Vs-Vg 较小）的时候，断开，即源极与漏极断开；</li>
+</ul>
+</li>
+</ul>
+<p>问题又来了，我们为什么要研究出这两种MOS管呢，能控制开关不就得了？答案就是，我们不一定非要在栅极高电压的时候就是导通，有的时候也想让栅极高电压时断开源极与漏极。说人话就是，我打开你这个开关的时候，不一定就是让你通电，还有可能是断电哦~<br>我们来看下面这个具体的例子：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/nMOS+pMOS.7eh6byp8tf.webp"
+                        alt="Image"
+                 >  </p>
+<ul>
+<li><p>当我们在点A施加一个和Vcc差不多的电压<br>那么这个时候，上方的pMOS压差小，就会断开；下方nMOS（相较于接地）压差大，就会导通-&gt;那么Y就是只和nMOS的源极GND接通，也就是和GND一样的低电压；</p>
+</li>
+<li><p>当我们在A点施加一个和GND差不多的电压<br>那么这个时候，上方的pMOS压差大，就会导通；下方nMOS和接入的电压差不多，就会断开-&gt;那么Y就是只和pMOS的源极Vcc接通，也就是和Vcc一样的高电压；</p>
+</li>
+</ul>
+<p>简单的说无论是nMOS还是pMOS，栅极和源极差不多的时候截止，差得多的时候导通。<br>像上面如图所示的MOSFET电路，既有nMOS也有pMOS，由于nMOS和pMOS具有互补的特性，我们就称它为CMOS(Complementary Metal-Oxide-Semiconductor)技术。</p>
+<h2 id="通过MOSFET实现门电路"><a href="#通过MOSFET实现门电路" class="headerlink" title="通过MOSFET实现门电路"></a>通过MOSFET实现门电路</h2><p>从前面的信息我们了解到，可以使用MOSFET实现导通和断开两种状态，因此我们还可以用它的漏极输出有无，来表示0和1这两个信号。<br>那现在我们想要对这两个实现各种转换，比如判断输入的两个信号是否一样，一样输出1，不一样输出2；再比如说，判断两个信号是不是都是0，都是0则输出1，不是输出0。我们把这种有特殊运行规则的电路叫做门电路，门电路实际上就是对数字信号进行运算。  </p>
+<h3 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h3><p>在分析MOSFET电路的时候，我自己的总结了几个新人容易踩坑的地方，并且说几点我自己的分析思路，可能有助于后人来入坑（？）<br>第一，我们所谓的输出1和0，高信号和低信号，其实就是输出的两种状态，所谓的输出是什么，只是我们人为定义的含义，我们甚至可以认为有输出是男生，无输出是女生。如何表示没有特定的规则，关键在于理解有没有输出这两种状态；<br>第二，在分析MOSFET电路的时候，我们不要想太多，仔细揣摩一下pMOS和nMOS的导通和截止的性质，在正确的MOSFET电路中，其实无论是pMOS还是nMOS，只要栅极和源极之间有大一点的压差，就会导通，无论谁大于谁；<br>第三，不要把GND认为是整个MOSFET电路电流的输出位置！GND只是零电位参考点，表示的是相对我们VCC来说的一个零电位，更低的一个点位，远低于VCC的一个电位。因此，其实我更推荐把VCC换为高压，GND换为低压来理解，我们的输入高信号也是高压，MOSFET是比较的栅极和源极之间有没有太大的压差；<br>第四，在分析MOSFET电路的时候，我一般会先关注控制高压的部分，看看哪几个MOS管控制高压，因为只有高压进入，才会有可能输出高信号。<br>第五，不管是什么门电路，MOS管始终控制的是电流的流入，而不是流出。这里又要强调，不要把GND认为是整个MOSFET电路电流输出位置！我们只是控制的是接通的低压，还是接通的高压，然后输出的是高压，低压，以此来表示高信号和低信号。拿最简单的非门来说，如下一节中所示的非门MOSFET电路图片中，上方的pMOS连接的是顶部的高压电源，下方的nMOS连接的是底部的低压电源（这里虽然是连接到的是GND零电位点，但是我们理解为是低压），所以pMOS控制高压流入，nMOS控制低压流入。</p>
+<h3 id="非门"><a href="#非门" class="headerlink" title="非门"></a>非门</h3><p>非门也叫反相器，是最简单的门电路。顾名思义，就是将我们的输入信号反过来，变成输出信号。其电路结构正是我们前面所看到的那个例子，将一个pMOS和一个nMOS并联起来。非门的MOSFET门电路和表示符号如下图所示：<br><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E9%9D%9E%E9%97%A8.73ucita0o4.webp"
+                        alt="Image"
+                 ><br>那我们想要彻底了解这个非门电路的运行情况，就需要引入一个叫做真值表的东西，其实就是表示这个电路能输入什么，对应的能输出什么。非门的真值表如下表所示：    </p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输出Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>一句话总结非门，就是信号取反，这个还是比较简单的。</p>
+<h3 id="与非门"><a href="#与非门" class="headerlink" title="与非门"></a>与非门</h3><p>接下来就是与非门。通过非门，相信你已经了解门电路是什么意思了，那我们这里先说与非门的结论：所有输入均为高时，才会有输出为低。我们来看一下与非门的MOSFET电路：<br><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E4%B8%8E%E9%9D%9E%E9%97%A8.wiyine9k9.webp"
+                        alt="Image"
+                 ><br>仔细观察的话，会发现电路是有两个pMOS并联，和两个nMOS串联实现的。pMOS控制Vcc，而nMOS用来控制是否接通GND，为整个电路接地。当有一个pMOS接通，Y就可以输出高信号。为了得到真值表，让我们来分析这个电路的每个元件的运行状况：</p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>pMOS-1</th>
+<th>pMOS-2</th>
+<th>nMOS-1</th>
+<th>nMOS-2</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>导通</td>
+<td>导通</td>
+<td>截止</td>
+<td>截止</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>导通</td>
+<td>截止</td>
+<td>导通</td>
+<td>截止</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>截止</td>
+<td>导通</td>
+<td>截止</td>
+<td>截止</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>截止</td>
+<td>截止</td>
+<td>导通</td>
+<td>导通</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>综上，我们只取输入与输出，可以得到下表的真值表：  </p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>可以得到和前面一样的结论：所有输入均为高时，才会有输出为低。</p>
+<h3 id="与门"><a href="#与门" class="headerlink" title="与门"></a>与门</h3><p>与门就是将与非门后面接一个非门，即把与门的输出取反。真值表如下表所示:  </p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>因此可以出结论：所有输入均为高时，才会有输出为高。可以看到，只有输出反过来了。<br>同理，我们也可以在与非门的MOSFET电路后面，加一个非门的MOSFET电路，就可以实现与门的MOSFET电路，电路结构和与门的符号表示如图所示：<br><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E4%B8%8E%E9%97%A8.102kgd7ca2.webp"
+                        alt="Image"
+                 > </p>
+<blockquote>
+<p>我们看图中与门的表示符号的输出端相比于与非门的符号，少了一小圆圈，这个小圆圈就是取反的意思。为什么多了取反电路，反而要去掉取反的小圆圈呢？我们可以这样理解，虽然与门的结果是与非门取反得到的，但是不看MOSFET电路，与非门的结果也是与门取反的结果。而“非”这个字就是取反的意思，因此与非门多了一个圈。“与”、“非”只是一种运算，和具体的MOSFET电路没啥关系，不是说有“非”就一定要有取反的电路。</p>
+</blockquote>
+<h3 id="或非门"><a href="#或非门" class="headerlink" title="或非门"></a>或非门</h3><p>先说结论：所有输入均为低时，才会有输出为高。因此，我们可以得出或非门的真值表：  </p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>或非门的MOSFET电路结构与与非门相似，如下图所示。可以看到，两个串联的pMOS控制高电压的进入，两个nMOS并联控制低电压的流入。我们可以理解为，pMOS只要有一个截止，高电压就会被截止，无法输出高信号，即A、B只要有一个为高信号，就会有pMOS截止，导致高电压无法流入，进而无法输出高信号。因此，所有输入均为低时，才会有输出为高。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E6%88%96%E9%9D%9E%E9%97%A8.3ns0qq0dlw.webp"
+                        alt="Image"
+                 > </p>
+<h3 id="或门"><a href="#或门" class="headerlink" title="或门"></a>或门</h3><p>按照与非门和与门的规律，或门就是或非门后面加上一个非门，就可以实现结果取反了。因此结论就是：所有输入均为低时，才会有输出为低。真值表如下：  </p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>根据上面我们说的或门是在或非门后面加上一个非门，我们可以画出相应的MOSFET电路结构：<br><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E6%88%96%E9%97%A8.8adnreyx9h.webp"
+                        alt="Image"
+                 >  </p>
+<h3 id="异或门"><a href="#异或门" class="headerlink" title="异或门"></a>异或门</h3><p>异或门用于进行异或(eXclusive OR, XOR)运算, 异或是一个特殊的运算, 通常在处理逻辑数据时使用, 其真值表如下:</p>
+<table>
+<thead>
+<tr>
+<th>输入A</th>
+<th>输入B</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>我是这样理解异或门的：“异”或门，即在或门的基础上，只对“异”信号输出高信号，即只有信号不一样的时候，才输出高信号，原本两个高信号也要输出低信号。<br>异或门电路可以通过一个或门和一个与门，两个非门来实现，如下图所示。对比前面的全定制MOSFET电路，少许复杂。</p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E5%BC%82%E6%88%96%E9%97%A8.64e95n79ig.webp"
+                        alt="Image"
+                 > </p>
+<blockquote>
+<p>全定制电路: 通过晶体管设计电路<br>在晶体管层次设计的电路称为全定制电路. 通过三输入与非门的例子, 我们可以看到, 全定制电路所需要的晶体管数量更少, 因此电路面积也更小. 在实际生产中, 除了面积更小之外, 全定制电路的主频也更高, 功耗更低。<br>但是, 全定制电路的设计难度大, 开发周期也很长. 现代处理器芯片包含动辄上亿个晶体管, 全部使用全定制电路来开发是不现实的. 对于超大规模集成电路的设计, 更常见的是采用的是半定制电路设计方法。<br>半定制电路的设计又分为基于标准单元的设计方法和基于门阵列的设计方法. 前者是预先用全定制方式设计出一些常用的逻辑单元, 例如与门、或门、触发器等, 这些逻辑单元称为标准单元; 然后再通过这些标准单元构建出大规模电路. 回到上面三输入与非门的例子, 如果把两输入的与门和两输入的与非门看成是标准单元, 那么通过它们搭建三输入与非门就可以看成是半定制电路的设计方法. 至于基于门阵列的设计方法, 一个常见的例子是FPGA. 但我们接下来不打算使用FPGA, 感兴趣的同学可以搜索相关资料。<br>在现代的处理器芯片设计中, 大部分情况下都使用基于标准单元的半定制电路设计方法; 只有在追求极致表现时(例如企业产品通过追求高性能占领市场), 才会对电路中的部分核心模块进行全定制设计。<br>引自：<a class="link"   target="_blank" rel="noopener" href="https://ysyx.oscc.cc/docs/2407/f/3.html" >https://ysyx.oscc.cc/docs/2407/f/3.html<i class="fas fa-external-link-alt"></i></a></p>
+</blockquote>
+<h3 id="门电路小结"><a href="#门电路小结" class="headerlink" title="门电路小结"></a>门电路小结</h3><p>到目前为止，我们已经学习了常用的6大门电路，也就是Logisim工具栏中的6种门电路，有了这6种逻辑门电路，就可以进行后面各种逻辑运算单元的搭建了，以下为汇总表。  </p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>特性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>非门</td>
+<td>信号取反</td>
+</tr>
+<tr>
+<td>与非门</td>
+<td>所有输入均为 高 时，才会有输出为 低</td>
+</tr>
+<tr>
+<td>与门</td>
+<td>所有输入均为 高 时，才会有输出为 高</td>
+</tr>
+<tr>
+<td>或非门</td>
+<td>所有输入均为 低 时，才会有输出为 高</td>
+</tr>
+<tr>
+<td>或门</td>
+<td>所有输入均为 低 时，才会有输出为 低</td>
+</tr>
+<tr>
+<td>异或门</td>
+<td>输入不一样时，输出高</td>
+</tr>
+</tbody></table>
 
                     
                 </div>
@@ -371,11 +698,11 @@
     <div class="copyright-info-content border-box">
         <div class="copyright-info-top border-box">
             <div class="copyright-post-title border-box text-ellipsis">
-                简记在Chromium内核浏览器上编辑网络请求
+                入坑数字逻辑电路基础心得
             </div>
 
             <div class="copyright-post-link border-box text-ellipsis">
-                2024/09/17/Edit-the-response-in-the-chromium/
+                2025/10/20/Getting-Started-with-the-Basics-of-Digital-Logic-Circuits/
             </div>
         </div>
 
@@ -391,7 +718,7 @@
                 <div class="type">
                     发布于
                 </div>
-                <div class="content">2024-09-17 19:55</div>
+                <div class="content">2025-10-20 20:49</div>
             </div>
 
 
@@ -423,6 +750,14 @@
 
                 <div class="post-bottom-tags-and-share border-box">
                     <div>
+                        
+                            <ul class="post-tags-box border-box">
+                                
+                                    <li class="tag-item border-box">
+                                        <i class="icon fas fa-hashtag"></i>&nbsp;<a href="/tags/EE/">EE</a>
+                                    </li>
+                                
+                            </ul>
                         
                     </div>
                     <div>
@@ -458,31 +793,15 @@
                 
                     <div class="post-nav border-box">
                         
-                            <div class="prev-post">
-                                <a class="prev"
-                                   rel="prev"
-                                   href="/2024/09/17/A-reverse-journey-of-Huawei-Bluetooth-headset-SPP-communication/"
-                                   title="一次华为蓝牙耳机SPP通讯的逆向之旅"
-                                >
-                                    <span class="left arrow-icon flex-center">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </span>
-                                    <span class="title flex-center">
-                                        <span class="post-nav-title-item text-ellipsis">一次华为蓝牙耳机SPP通讯的逆向之旅</span>
-                                        <span class="post-nav-item">上一篇</span>
-                                    </span>
-                                </a>
-                            </div>
-                        
                         
                             <div class="next-post">
                                 <a class="next"
                                    rel="next"
-                                   href="/2024/08/01/Customize-UEFI-boot-logo-for-insyde-BIOS/"
-                                   title="分离机械革命笔记本电脑的EXE格式BIOS固件，并修改Insyde BIOS的UEFI启动logo"
+                                   href="/2025/02/19/Quick-Start-ToF-Laser-Distance-Sensor-VL6180/"
+                                   title="快速入门在STM32标准库上的ToF激光测距传感器 - VL6180"
                                 >
                                     <span class="title flex-center">
-                                        <span class="post-nav-title-item text-ellipsis">分离机械革命笔记本电脑的EXE格式BIOS固件，并修改Insyde BIOS的UEFI启动logo</span>
+                                        <span class="post-nav-title-item text-ellipsis">快速入门在STM32标准库上的ToF激光测距传感器 - VL6180</span>
                                         <span class="post-nav-item">下一篇</span>
                                     </span>
                                     <span class="right arrow-icon flex-center">
@@ -510,7 +829,7 @@
             <div class="pc-post-toc right-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%86%9F%E6%82%89"><span class="nav-text">1. 熟悉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E6%9E%90"><span class="nav-text">2. 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BF%AE%E6%94%B9%E5%93%8D%E5%BA%94%E5%80%BC"><span class="nav-text">3. 修改响应值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final"><span class="nav-text">Final:</span></a></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li></ol>
     </div>
 </div>
 
@@ -688,7 +1007,7 @@
             <div class="tablet-post-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%86%9F%E6%82%89"><span class="nav-text">1. 熟悉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%88%86%E6%9E%90"><span class="nav-text">2. 分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E4%BF%AE%E6%94%B9%E5%93%8D%E5%BA%94%E5%80%BC"><span class="nav-text">3. 修改响应值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Final"><span class="nav-text">Final:</span></a></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li></ol>
     </div>
 </div>
 
