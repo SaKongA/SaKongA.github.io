@@ -2,7 +2,7 @@
 title: MaixBit + STM32 + PCA9685 实现的双向舵机垃圾分类项目 - 代码调用部分解析
 date: 2024-11-24 17:48:26
 updated: 2024-11-25 00:08:16
-tags:
+tags: EE
 ---
 ## MaixBit - 图像识别处理部分
 - `Path:` main.py
