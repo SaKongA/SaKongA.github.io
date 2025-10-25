@@ -310,7 +310,7 @@
             
                 <span class="meta-info-item post-update-date">
                     <i class="icon fa-solid fa-file-pen"></i>&nbsp;
-                    <span class="datetime" data-updated="Thu Oct 23 2025 17:00:01 GMT+0800">2025-10-23 17:00:01</span>
+                    <span class="datetime" data-updated="Sat Oct 25 2025 12:30:01 GMT+0800">2025-10-25 12:30:01</span>
                 </span>
             
         
@@ -351,7 +351,7 @@
 
                     
                          <h2 id="Before-This"><a href="#Before-This" class="headerlink" title="Before This"></a>Before This</h2><p>或许是这个故事的起点？</p>
-<h2 id="我理解的数字电路与模拟电路？"><a href="#我理解的数字电路与模拟电路？" class="headerlink" title="我理解的数字电路与模拟电路？"></a>我理解的数字电路与模拟电路？</h2><p>对于数字电路，最简单的解释就是用电路中的电压、电流等物理量来表示0和1两种状态，没错，通常就只是这两种状态。非要用不严谨的描述来说的话，数字电路就是用高电压和低电压两种状态来表示0和1。有了0与1这两个数字之后，我们就有了二进制计数法，有了二进制，我们就可以表示任意大的数量了；<br>那模拟电路呢？我们知道，在电路里面电压、电流等物理量不是只有高低、通断两种状态，还有具体的大小变化，他们都是连续的，模拟电路就是用这种连续的量来表示具体的数据。<br>举个栗子，0V与5V，如果我们只关注这两个值，我们可以说是一个高电压，一个低电压，从而有了数字电路的概念。但是如果我们关注整体，想一下从0V变化到5V，它是一个连续的过程，比如0.1V,1V,2V….4.8V，5V，在这个过程中，我们所得到的信息是连续不断的，而不是像数字电路一样只关注起始的0V和5V，这就是模拟电路的意思。<br><img  
+<h2 id="我理解的数字电路与模拟电路？"><a href="#我理解的数字电路与模拟电路？" class="headerlink" title="我理解的数字电路与模拟电路？"></a>我理解的数字电路与模拟电路？</h2><p>对于数字电路，最简单的解释就是用电路中的电压、电流等物理量来表示0和1两种状态，没错，通常就只是这两种状态。非要用不严谨的描述来说的话，数字电路就是用高电压和低电压两种状态来表示0和1。有了0与1这两个数字之后，我们就有了二进制计数法，有了二进制，我们就可以表示任意大的数量了；<br>那模拟电路呢？我们知道，在电路里面电压、电流等物理量不是只有高低、通断两种状态，还有具体的大小变化，他们都是连续的，模拟电路就是用这种连续的量来表示具体的数据。<br>举个栗子，0V与5V，如果我们只关注这两个值，我们可以说是一个高电压，一个低电压，从而有了数字电路的概念。但是如果我们关注整体，想一下从0V变化到5V，它是一个连续的过程，比如0.1V,1V,2V ··· 4.8V，5V，在这个过程中，我们所得到的信息是连续不断的，而不是像数字电路一样只关注起始的0V和5V，这就是模拟电路的意思。<br><img  
                        lazyload
                        alt="image"
                        data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF.175sbsthpj.webp"
@@ -688,7 +688,310 @@
 <td>输入不一样时，输出高</td>
 </tr>
 </tbody></table>
-
+<h2 id="进位计数法"><a href="#进位计数法" class="headerlink" title="进位计数法"></a>进位计数法</h2><p>经过前面门电路的学习，我们知道CMOS电路可以，也只可以处理高信号、低信号，即0和1两种状态的信号。如果我们想要通过CMOS电路完成我们实际生活中的逻辑运算，就需要某种特殊的表示方法，只用这两种状态的信号，来表示其他事物。<br>比如我们现在想做一个计算器，就需要用门电路计算加减法，但是我们平时学习的加减法，都是十进制计数法，用0-9这10个数字来表示，而门电路只能处理0与1两种状态的信号，所以我们就要用一种特殊的计数法，只用0与1来表示十进制所有的数字。<br>这种表示方式称为”编码”(encoding)。物理世界中的信息有很多, 我们先考虑如何表示自然数。  </p>
+<h3 id="二进制计数法"><a href="#二进制计数法" class="headerlink" title="二进制计数法"></a>二进制计数法</h3><p>在了解二进制之前，我们先学习十进制的组成。<br>假设我们现在有一个十进制数字“734”，如果我们只用10、10²、10³…等表示，可以像下面的式子一样拆解：  </p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">734 = 7x100 + 3x10 + 4x1</span><br><span class="line">    = 7x10² + 3x10¹ + 4x10º</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">“734”是一个三位十进制数字，那如果我们有一个随机的三位十进制数字呢？如：“a₂a₁a₀”（如果和734进行对应，a₂对应7，a₁对应3，a₀对应4），那么可以按照如下拆解：  </span><br><span class="line"> </span><br><span class="line">```TEXT</span><br><span class="line">a₂a₁a₀ = a₂x100 + a₁x10 + a₀x1</span><br><span class="line">       = a₂x10² + a₁x10¹ + a₀x10º</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">很好，那如果我们扩展到n位的随机十进制数字呢？即：“aₙ₋₁aₙ₋₂···a₂a₁a₀”,那么可以按照如下拆解：</span><br><span class="line">  </span><br><span class="line">```TEXT</span><br><span class="line">aₙ₋₁aₙ₋₂···a₂a₁a₀ = aₙ₋₁x10ⁿ⁻¹ + aₙ₋₂x10ⁿ⁻² + ··· + a₂x10² + a₁x10¹ + a₀x10º</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">我们如果想把这个规律扩展到其他进制的数字呢？我们可以发现，十进制和其他的进制拆开后，最大的区别就是乘的数字不同，故可以得到以下规律：  </span><br><span class="line">通常，对于n位b进制数“aₙ₋₁aₙ₋₂···a₂a₁a₀”，其真值可以通过以下加权求和展开式得到：</span><br><span class="line">  </span><br><span class="line">![Image](https://github.com/SaKongA/picx-images-hosting/raw/master/加权求和.2yyr8c2mv2.webp)</span><br><span class="line">  </span><br><span class="line">其中，“b”称为基（base），“bⁱ”称为每一位的权重。  </span><br><span class="line">现在，如果我们想要用这个方式来表示二进制数，只需要让 b = 2，并让 aᵢ 在“0”和“1”中取值即可，这样，我们就得到了二进制(binary)计数法。  </span><br><span class="line">但是有一个问题，由于十进制也会使用数字“0”与“1”，如数字“11”。我们需要一种办法区别某个数字是用十进制表示的，还是二进制。有的编程语言，通过在二进制数字最前面添加前缀`0b`来表示这个数字是一个二进制数字，如`0b010111`；有的则是在二进制数字末尾添加右下角的角标`B`，如：`01010111B`。我们主要采用第一种办法，使用前缀`0b`来表示我们的数字是一个二进制数。例如, 二进制数`0b00101110`的真值是：</span><br><span class="line">  </span><br><span class="line">```TEXT</span><br><span class="line">0b00101110 = 1x2⁵ + 1x2³ + 1x2² + 1x2¹</span><br><span class="line">           = 32 + 8 + 4 + 2</span><br><span class="line">           = 46</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">那如果我们想要把一个十进制的数字转为二进制数字呢？一种办法是通过上面的展开式，把每一项进行进一步的展开，如下图所示：  </span><br><span class="line">  </span><br><span class="line">![Image](https://github.com/SaKongA/picx-images-hosting/raw/master/十进制数公式展开求二进制数.7eh6dlf132.webp)</span><br><span class="line">  </span><br><span class="line">不难发现，其实这个过程的本质就是让待转换的十进制数字不断的除二，然后取余数，因此，有了第二种转换的办法--&quot;短除法&quot;。  </span><br><span class="line">短除法，顾名思义，即不断的把待转换数字除2，取余数的竖式，在式子中，先得到的余数，作为转换出的二进制数的最低位，如下图所示：</span><br><span class="line">  </span><br><span class="line">```TEXT</span><br><span class="line">2 | 46   -&gt; 0          ^  低位</span><br><span class="line">  +----                |</span><br><span class="line"> 2 | 23   -&gt; 1         |</span><br><span class="line">   +----               |</span><br><span class="line">  2 | 11   -&gt; 1        |</span><br><span class="line">    +----              |</span><br><span class="line">   2 | 5    -&gt; 1       |</span><br><span class="line">     +----             |</span><br><span class="line">    2 | 2    -&gt; 0      |</span><br><span class="line">      +----            |</span><br><span class="line">     2 | 1    -&gt; 1     |  高位</span><br><span class="line">       +----</span><br><span class="line">         0 (商为0, 结束)</span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">同样可以得出“46”的二进制计数结果为：0b11101，和上面第一种办法得出的结果，省略高位的无意义0后一致。  </span><br><span class="line">  </span><br><span class="line">### 十六进制计数法</span><br><span class="line">除了我们最熟悉的十进制计数法、二进制计数法，计算机还有一个常见的计数法--十六进制计数法(hexadecimal)，在十进制的0-9共10个数字的基础上，增加了a、b、c、d、e、f六个字母来表示十进制中的10、11、12、13、14、15，所以一位16进制数字可以表示0-15共16个十进制数字。  </span><br><span class="line">同样的，它也需要特定的前缀或后缀来表明一串数字是十六进制。在一些教材在整串数字的右下角添加字母`H`来表示这个数字是一个十六进制数；另一种表示的方法就是在整串数字前面添加前缀`0x`，如`0xbeef`。  </span><br><span class="line">根据我们的公式，如果想把这个十六进制数字转化为10进制真值，其加权求和展开公式如下：</span><br><span class="line">  </span><br><span class="line">```TEXT</span><br><span class="line">0xbeef = 11x16³ + 14x16² + 14x16¹ + 15x16⁰</span><br><span class="line">       = 45056 + 3584 + 224 + 15</span><br><span class="line">       = 48879</span><br><span class="line">```  </span><br><span class="line">  </span><br><span class="line">虽然数字电路无法直接处理十六进制数，但是由于 16=2⁴，我们可以把一个二进制数字，每四位作为一组，然后转化为对应的16进制（即先把4位的二进制数字转为十进制，然后找到十进制数字对应到其十六进制数字）：</span><br><span class="line">  </span><br><span class="line">```TEXT</span><br><span class="line">1011 1110 1110 1111</span><br><span class="line"> |    |    |    |</span><br><span class="line"> 11   14   14   15</span><br><span class="line"> |    |    |    |</span><br><span class="line"> b    e    e    f</span><br></pre></td></tr></table></figure>
+<p>对于高位不足的情况，我们直接补<code>0</code>，凑到4个数一组即可，如<code>0b1111011101111</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">0001 1110 1110 1111</span><br><span class="line"> |    |    |    |</span><br><span class="line"> 1   14   14   15</span><br><span class="line"> |    |    |    |</span><br><span class="line"> 1    e    e    f</span><br></pre></td></tr></table></figure>
+<p>因此, 该二进制数对应的十六进制数即为0x1eef. 可以看到, 和二进制表示的0b1111011101111相比, 十六进制表示的0x1eef更加简洁紧凑。</p>
+<h2 id="通过门电路搭建基本组合逻辑电路"><a href="#通过门电路搭建基本组合逻辑电路" class="headerlink" title="通过门电路搭建基本组合逻辑电路"></a>通过门电路搭建基本组合逻辑电路</h2><p>从这一节开始，我们就开始进入数电的核心部分了，前面我们说的门电路和进位计数法均为组合逻辑电路的基础，现在我们需要把门电路和二进制数结合到一起，通过门电路处理二进制数据，进行特定的逻辑运算，如加法、减法等，最终作为成品的模块。  </p>
+<h3 id="译码器"><a href="#译码器" class="headerlink" title="译码器"></a>译码器</h3><p>译码器是一种将k位输入转为为2ᵏ种不同输出的电路。听完这句话之后你是不是很懵，这是什么意思，他有什么用？别急，我们从最简单的“n选1译码器”开始了解译码器。  </p>
+<h4 id="n选1译码器"><a href="#n选1译码器" class="headerlink" title="n选1译码器"></a>n选1译码器</h4><p>对于“n选1译码器”，我们可以通过现象来理解它，前面说了，“n选1译码器”是最简单的一类译码器，那我们来看一个“n选1译码器”中简单的4选1译码器：2-4译码器。根据名字来看，2表示这个译码器有两个输入，4个输出，我们假定两个输入为“A₁”、“A₀”，四个输出依次为：“Y₃”、“Y₂”、“Y₁”、“Y₀”，那么2-4译码器的真值表如下：  </p>
+<table>
+<thead>
+<tr>
+<th>A₁</th>
+<th>A₀</th>
+<th>Y₃</th>
+<th>Y₂</th>
+<th>Y₁</th>
+<th>Y₀</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<p>我们仔细观察真值表，并把输出作为一串数字（不要纠结是什么进制的数字，就是一串没有意义的数字），可以得到以下规律并理解什么是译码器：  </p>
+<ul>
+<li>这个译码器有2个输入，4个输出；<br>-&gt; 即章节开头所说的，译码器是一种将k位输入转为为2ᵏ种不同输出的电路，输入的位数和输出的位数是相对应的。而“n选1译码器”就是有n位输入，2ⁿ位输出的一种特殊译码器。</li>
+<li>无论输入是什么，输出最多有一位是1，而且1在不同输入的情况下，所在的位数还不一样；<br>-&gt; 这就是“n选1”的意义，即从n位输出中，选出特定的1位，输出1，有且仅有1位。 </li>
+<li>如果我们把输入信号作为一个二进制数值，比如A₁为1，A₀为0的时候，二进制数字<code>10</code>表示的是十进制数字3，而你惊奇的发现，输出中唯一的1，正是在第3位；<br>-&gt; 这就是“n选1译码器”的核心功能–“选择”。你可以理解成，“n选1译码器”把你输入的信号，看作一个二进制数，然后通过门电路，将这个选择体现在真实的电路中，而不再是一个抽象的数字。举个简单的例子，比如现在有很多人在排队，你想快速找到第97个人是谁，我们通常的办法就是从头开始数，直到数到第97个人，但是现在有了“n选1译码器”，我们想要找到第97个人，在“n选1译码器”上面输入97，“n选1译码器”就会给第97个人发消息，让他直接出列，大大减少了我们的寻找时间。</li>
+</ul>
+<p>对于“n选1译码器”，我们已经知道了她的输出不管有多少位，最多只会有一个1，如果我们把2-4译码器的输出看作一串数字，所有可以输出的数字为：0001，0010,0100，1000。类似的，像输出仅有1位为1的一串数字, 称为”独热码”(One-hot)，它是一种特殊的编码，就是一种表示某些特殊含义的编码，和二进制、十进制等等都没有关系，只是一串有着特殊含义的数字而已。<br>通过上面的规律分析，我们基本了解了“n选1译码器”的特性，让我们来看一下“n选1译码器”的具体门电路结构，如下图所示：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/2-4%E8%AF%91%E7%A0%81%E5%99%A8.9gwz1ndm4c.webp"
+                        alt="Image"
+                 ></p>
+<p>在计算机中, n选1译码器常用于实现寻址的部分功能, 此时译码器的输入即为地址, 输出则是选择信号, 其中与地址对应的选择信号为1。</p>
+<h4 id="转码器"><a href="#转码器" class="headerlink" title="转码器"></a>转码器</h4><p>既然n选1译码器可以输出独热码，将二进制数字转化为具体的选择结果，那我们是不是也可以将二进制数字转化为某种我们想要的结果呢？有的兄弟，让我们来认识一下：转码器(code translator)。<br>转码器其实是对“将二进制数字转化为某种我们想要的结果”的译码器的统称，一个常见应用是七段数码管译码器(7-segment decoder)。七段数码管是一个由7段发光二极管按”8”字型排列组成的输出元件，其每一段发光二极管都可以单独的控制，通常是按照下面图片所示来定义每个数码管的字母标识：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E4%B8%83%E6%AE%B5%E6%95%B0%E7%A0%81%E7%AE%A1.45i2gxrjga.webp"
+                        alt="Image"
+                 >  </p>
+<p>如果我们想要通过让七段数码管显示我们想要的数字，就需要点亮特定的发光二极管，也就是向特定编号的发光二极管输出高电平。问题来了，我们总不能手动给每一个发光二极管通吧，太麻烦了，于是七段数码管译码器就出现了。我们可以向七段数码管译码器输入一个二进制整数，让七段数码管译码器帮我自动点亮表示这个整数所需要的发光二极管，即告诉所有的发光二极管，你应该亮还是不亮。我们按照a、b、c、d、e、f、g、h的顺序，让七段数码管译码器输出这样顺序的编码，如下所示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">input    output</span><br><span class="line">        abcdefgh</span><br><span class="line"> 0100   01100110</span><br></pre></td></tr></table></figure>
+<p>假设我们的七段数码管是高电平点亮，那么，我输入0100(4的二进制数字)，译码器就会输出01100110，然后点亮b、c、f、g共4个发光二极管，效果就是显示了个数字“4”。</p>
+<h3 id="编码器"><a href="#编码器" class="headerlink" title="编码器"></a>编码器</h3><p>编码器(encoder)就是反过来的译码器，它可以把输入当做独热码，然后转为对应的二进制数值。例如, 一个4-2编码器有四位输入A₃、A₂、A₁、A₀，两位输出Y₁、Y₀，可以得到其真值表如下：</p>
+<table>
+<thead>
+<tr>
+<th>A₃</th>
+<th>A₂</th>
+<th>A₁</th>
+<th>A₀</th>
+<th>Y₁</th>
+<th>Y₀</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>其</td>
+<td>它</td>
+<td>输</td>
+<td>入</td>
+<td>X</td>
+<td>X</td>
+</tr>
+</tbody></table>
+<p>于是，我们可以得到这样的结论：和译码器相反，编码器有2ⁿ位输入，n位输出，对于4-2编码器来说，如果输入是独热码，定义输入中为1的是第x位，那么就会输出x的二进制数值；如果输入的不是独热码，如“0101”，那么输出是未定义的。<br>对应到前面排队的那个例子，就好比某一个同学主动出列，4-2编码器可以立马告诉他：“同学你是第97位”，而不用同学自己一个人一个人的去数了。<br>在计算机中, 编码器常用于根据用独热码表示的选择信号生成相应地址。另一种理解是用于找出独热码中1的位置。</p>
+<h3 id="多路选择器"><a href="#多路选择器" class="headerlink" title="多路选择器"></a>多路选择器</h3><p>前面我们通过“n选1译码器”实现了输入二进制数字，输出对应特定位的高信号的功能，由此，我们可以基于“n选1译码器”，实现从几路输入选择某一路输出，这就是多路选择器，从多路输入中选一路输出。<br>最简单的选择器是“1位2选1选择器”，即1位选择信号输入，从2路待选择的信号中选出一路进行输出，顾名思义，是基于1-2译码器来实现的，其电路结构如图所示：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/1%E4%BD%8D2%E9%80%891%E9%80%89%E6%8B%A9%E5%99%A8.32id61vpkx.webp"
+                        alt="Image"
+                 ></p>
+<p>其简化后的真值表如下：  </p>
+<table>
+<thead>
+<tr>
+<th>S</th>
+<th>Y</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>D₀</td>
+</tr>
+<tr>
+<td>1</td>
+<td>D₁</td>
+</tr>
+</tbody></table>
+<p>在计算机中, 选择器是使用频率很高的元件, 因为计算机的本质是用于处理数据, 而数据的来源和处理方式都很多, 因此需要大量的选择器来对数据来源和处理结果进行选择。</p>
+<h3 id="比较器"><a href="#比较器" class="headerlink" title="比较器"></a>比较器</h3><p>假设你现在想要对比两个二进制数：<code>0b101011110111</code>和<code>0b101001110111</code>是否一致，直接看的话，可能有点费劲，于是有了比较器这个东西。比较器本质上是通过异或门+非门（也就是同或门）来比较二进制数字的每一位，只有两个数字完全一致的时候，才会输出1，说起来可能有点抽象，看图你立马就明白了。<br>现在我们有两个二进制数需要比较：<code>0bA₀A₁A₂A₃</code>和<code>0bB₀B₁B₂B₃</code>，可以按照下面的4位比较器电路结构进行输入和比较：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/4%E4%BD%8D%E6%AF%94%E8%BE%83%E5%99%A8.9o06x2zrk0.webp"
+                        alt="Image"
+                 ></p>
+<p>我相信你看完图就瞬间明白了，比较器是如何工作的，即通过比较输入的二进制数的每一位，只要有一位不一致，对于使用异或门+非门搭建的比较器，异或门就会输出1给非门，非门反转后，将0传递给与门，与门只有所有输入全为1的时候，才会输出1，所以就会输出0。而使用同或门搭建的比较器，省了非门反转这一步。</p>
+<h3 id="加法器"><a href="#加法器" class="headerlink" title="加法器"></a>加法器</h3><p>从加法器开始，你将会慢慢的切身感受到数电的强大之处，因为这是真正意义上的离我们最近的逻辑运算。<br>加法是算术运算的基础, 因此需要考虑如何通过门电路实现加法。首先考虑1位加法器，也就是两个一位的二进制数的相加，思考一下，两个一位的二进制数的相加，因此有两个输入；相加的话，1+1&#x3D;2，会成为一个两位二进制数，因为在二进制计算中进位了，因此至少要有两个输出，一个表示最低位，一个表示是否进位了。据此，我们可以得到1位加法器的真值表，其中S代表Sum，即输出和；C代表Carry，即输出进位：  </p>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th></th>
+<th>S</th>
+<th>C</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td></td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>半加器的逻辑门电路如下图所示：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E5%8D%8A%E5%8A%A0%E5%99%A8.5trff46n0a.webp"
+                        alt="Image"
+                 ></p>
+<p>现在，我们已经明白了当两个一位二进制数相加，可以用一个Sum和Carry来表示最后的结果，但是如果是两个两位或两位以上的二进制数相加呢？第二位相加的时候，怎么处理上一位的进位呢？这个时候就需要引入“全加器”这个东西了。<br>全加器需要输入三个信号，分别是A(加数)、B(被加数)、C-in(Carry-In，即来自低位的进位)；有两个输出信号，分别是S(Sum，即输出和)、c-out(Carry-Out，即当前位计算的输出进位)，容易得出，其真值表如下表所示：  </p>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>C-in</th>
+<th></th>
+<th>S</th>
+<th>C-out</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td></td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td></td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td></td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td></td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody></table>
+<p>全加器的逻辑门电路如下图所示：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/%E5%85%A8%E5%8A%A0%E5%99%A8.2vf5blydix.webp"
+                        alt="Image"
+                 ></p>
+<p>回到加法器的起点，最简单的多位加法器（就是计算多位二进制数相加的器件），其实就是把两个多位二进制数的第一位通过半加器相加，后面的位通过全加器分别相加。其中，第一位通过半加器相加后，如果有输出进位，就传递给后一位的全加器，然后后一位的全加器如果有进位，进一步传给后面的全加器，以此类推，就可以实现多位加法器。4位加法器的计算流程如下图所示：  </p>
+<p><img  
+                       lazyload
+                       alt="image"
+                       data-src="https://github.com/SaKongA/picx-images-hosting/raw/master/4%E4%BD%8D%E5%8A%A0%E6%B3%95%E5%99%A8.8l0hn6cw1c.webp"
+                        alt="Image"
+                 >  </p>
+<p>细心的你肯定发现了，为什么第一位计算，半加器会有进位C0输入呢？答案就是，第一位计算也用的是全加器，但是并不影响使用，C0固定输入0即可。</p>
+<h2 id="整数的机器级表示"><a href="#整数的机器级表示" class="headerlink" title="整数的机器级表示"></a>整数的机器级表示</h2>
                     
                 </div>
 
@@ -829,7 +1132,7 @@
             <div class="pc-post-toc right-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E4%BD%8D%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="nav-text">进位计数法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="nav-text">二进制计数法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E9%97%A8%E7%94%B5%E8%B7%AF%E6%90%AD%E5%BB%BA%E5%9F%BA%E6%9C%AC%E7%BB%84%E5%90%88%E9%80%BB%E8%BE%91%E7%94%B5%E8%B7%AF"><span class="nav-text">通过门电路搭建基本组合逻辑电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%91%E7%A0%81%E5%99%A8"><span class="nav-text">译码器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#n%E9%80%891%E8%AF%91%E7%A0%81%E5%99%A8"><span class="nav-text">n选1译码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AC%E7%A0%81%E5%99%A8"><span class="nav-text">转码器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-text">编码器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E8%B7%AF%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-text">多路选择器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E5%99%A8"><span class="nav-text">比较器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E6%B3%95%E5%99%A8"><span class="nav-text">加法器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA"><span class="nav-text">整数的机器级表示</span></a></li></ol>
     </div>
 </div>
 
@@ -1007,7 +1310,7 @@
             <div class="tablet-post-toc">
                 <div class="post-toc-wrap border-box">
     <div class="post-toc border-box">
-        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Before-This"><span class="nav-text">Before This</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%90%86%E8%A7%A3%E7%9A%84%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF%E4%B8%8E%E6%A8%A1%E6%8B%9F%E7%94%B5%E8%B7%AF%EF%BC%9F"><span class="nav-text">我理解的数字电路与模拟电路？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8MOS%E7%AE%A1%E8%A1%A8%E7%A4%BA0%E5%92%8C1"><span class="nav-text">用MOS管表示0和1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87MOSFET%E5%AE%9E%E7%8E%B0%E9%97%A8%E7%94%B5%E8%B7%AF"><span class="nav-text">通过MOSFET实现门电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E5%9C%A8%E5%89%8D%E9%9D%A2"><span class="nav-text">写在前面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E9%97%A8"><span class="nav-text">非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%9D%9E%E9%97%A8"><span class="nav-text">与非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8E%E9%97%A8"><span class="nav-text">与门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%9D%9E%E9%97%A8"><span class="nav-text">或非门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%96%E9%97%A8"><span class="nav-text">或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E9%97%A8"><span class="nav-text">异或门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%A8%E7%94%B5%E8%B7%AF%E5%B0%8F%E7%BB%93"><span class="nav-text">门电路小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E4%BD%8D%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="nav-text">进位计数法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="nav-text">二进制计数法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E8%BF%87%E9%97%A8%E7%94%B5%E8%B7%AF%E6%90%AD%E5%BB%BA%E5%9F%BA%E6%9C%AC%E7%BB%84%E5%90%88%E9%80%BB%E8%BE%91%E7%94%B5%E8%B7%AF"><span class="nav-text">通过门电路搭建基本组合逻辑电路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%91%E7%A0%81%E5%99%A8"><span class="nav-text">译码器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#n%E9%80%891%E8%AF%91%E7%A0%81%E5%99%A8"><span class="nav-text">n选1译码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AC%E7%A0%81%E5%99%A8"><span class="nav-text">转码器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-text">编码器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E8%B7%AF%E9%80%89%E6%8B%A9%E5%99%A8"><span class="nav-text">多路选择器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E8%BE%83%E5%99%A8"><span class="nav-text">比较器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E6%B3%95%E5%99%A8"><span class="nav-text">加法器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E6%95%B0%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA"><span class="nav-text">整数的机器级表示</span></a></li></ol>
     </div>
 </div>
 
